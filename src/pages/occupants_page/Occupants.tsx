@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { User, Phone, IdCard, Heart, HeartOff, RefreshCw, Search, ChevronLeft, ChevronRight, Users, AlertCircle, Plus, Pencil, Trash2, Camera, Eye } from 'lucide-react';
+import { User, Phone, IdCard, Heart, HeartOff, RefreshCw, Search, ChevronLeft, ChevronRight, Users, AlertCircle, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 import { OccupantModal } from './components/OccupantModal';
 import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
 import { OccupantDetailModal } from './components/OccupantDetailModal';
@@ -49,6 +49,7 @@ export default function Occupants() {
   
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedOccupantDetail, setSelectedOccupantDetail] = useState<Occupant | null>(null);
+  const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
 
   const fetchOccupants = useCallback(async () => {
     setLoading(true);
@@ -117,7 +118,7 @@ export default function Occupants() {
   };
 
   const handleShowDetail = async (id: number) => {
-    setLoading(true);
+    setLoadingDetailId(id);
     try {
       const res = await api.get(`/occupants/${id}`);
       setSelectedOccupantDetail(res.data.data);
@@ -125,7 +126,7 @@ export default function Occupants() {
     } catch (err: any) {
       setError('Gagal memuat detail warga.');
     } finally {
-      setLoading(false);
+      setLoadingDetailId(null);
     }
   };
 
@@ -314,8 +315,13 @@ export default function Occupants() {
                       onClick={() => handleShowDetail(o.occupant_id)}
                       className="btn btn-ghost btn-square btn-xs text-primary hover:bg-primary/10 transition-colors"
                       title="Lihat Detail"
+                      disabled={loadingDetailId === o.occupant_id}
                     >
-                      <Eye size={14} />
+                      {loadingDetailId === o.occupant_id ? (
+                        <RefreshCw size={14} className="animate-spin" />
+                      ) : (
+                        <Eye size={14} />
+                      )}
                     </button>
                     <button 
                       onClick={() => { handleEdit(o); setFormErrors({}); }}

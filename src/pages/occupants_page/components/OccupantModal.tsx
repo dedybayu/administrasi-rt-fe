@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Save, Loader2, User, Phone, Heart, IdCard, Upload, Image as ImageIcon, Clock, AlertCircle } from 'lucide-react';
+import { X, Save, Loader2, User, Phone, Heart, IdCard, Upload, Clock, AlertCircle } from 'lucide-react';
 import api from '../../../utils/api';
 
 
