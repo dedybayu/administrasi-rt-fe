@@ -219,7 +219,7 @@ export default function Houses() {
   };
 
   return (
-    <div className="p-4 sm:p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-700">
+    <div className="p-4 sm:p-8 space-y-8 max-w-xxl mx-auto animate-in fade-in duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-black tracking-tight text-base-content">Manajemen Data Rumah</h2>
