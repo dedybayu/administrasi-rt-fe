@@ -8,7 +8,6 @@ import {
   ChevronLeft, 
   ChevronRight, 
   AlertCircle,
-  Hash,
   Activity,
   UserPlus,
   Pencil,
@@ -19,7 +18,8 @@ import {
   Eye,
   Phone,
   UserCheck,
-  History
+  History,
+  Calendar
 } from 'lucide-react';
 
 interface Occupant {
@@ -68,8 +68,10 @@ export default function Houses() {
   const [addOccupantData, setAddOccupantData] = useState({
     occupant_id: '',
     start_in_date: new Date().toISOString().split('T')[0],
+    end_in_date: '',
     is_current: true
   });
+  const [editingHouseOccupantId, setEditingHouseOccupantId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     house_name: '',
     house_number: ''
@@ -156,6 +158,18 @@ export default function Houses() {
     setIsDetailModalOpen(false);
     setCurrentHouse(null);
     setShowAddForm(false);
+    setEditingHouseOccupantId(null);
+  };
+
+  const handlePrepEditOccupant = (ho: HouseOccupant) => {
+    setAddOccupantData({
+      occupant_id: String(ho.occupant.occupant_id),
+      start_in_date: ho.start_in_date ? ho.start_in_date.split('T')[0] : '',
+      end_in_date: ho.end_in_date ? ho.end_in_date.split('T')[0] : '',
+      is_current: ho.is_current
+    });
+    setEditingHouseOccupantId(ho.house_occupant_id);
+    setShowAddForm(true);
   };
 
   const handleAddOccupant = async (e: React.FormEvent) => {
@@ -164,21 +178,30 @@ export default function Houses() {
     
     setSubmitting(true);
     try {
-      await api.post('/house-occupants', {
-        house_id: currentHouse.house_id,
-        ...addOccupantData
-      });
+      if (editingHouseOccupantId) {
+        await api.put(`/house-occupants/${editingHouseOccupantId}`, {
+          house_id: currentHouse.house_id,
+          ...addOccupantData
+        });
+      } else {
+        await api.post('/house-occupants', {
+          house_id: currentHouse.house_id,
+          ...addOccupantData
+        });
+      }
       // Refresh detail
       handleOpenDetail(currentHouse);
       setShowAddForm(false);
+      setEditingHouseOccupantId(null);
       setAddOccupantData({
         occupant_id: '',
         start_in_date: new Date().toISOString().split('T')[0],
+        end_in_date: '',
         is_current: true
       });
       fetchHouses(); // Refresh stats
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Gagal menambahkan penghuni.');
+      alert(err.response?.data?.message || 'Gagal menyimpan data penghuni.');
     } finally {
       setSubmitting(false);
     }
@@ -579,7 +602,7 @@ export default function Houses() {
       {/* Detail Modal */}
       {isDetailModalOpen && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-lg p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
+          <div className="modal-box max-w-3xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
             <div className="p-6 bg-primary text-primary-content">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -612,7 +635,18 @@ export default function Houses() {
                   <h4 className="font-black text-sm uppercase tracking-widest">Daftar Penghuni</h4>
                 </div>
                 <button 
-                  onClick={() => setShowAddForm(!showAddForm)}
+                  onClick={() => {
+                    setShowAddForm(!showAddForm);
+                    if (showAddForm) {
+                      setEditingHouseOccupantId(null);
+                      setAddOccupantData({
+                        occupant_id: '',
+                        start_in_date: new Date().toISOString().split('T')[0],
+                        end_in_date: '',
+                        is_current: true
+                      });
+                    }
+                  }}
                   className={`btn btn-xs gap-1 font-bold rounded-lg ${showAddForm ? 'btn-ghost text-error' : 'btn-primary'}`}
                 >
                   {showAddForm ? <X size={14} /> : <UserPlus size={14} />}
@@ -623,8 +657,16 @@ export default function Houses() {
               {showAddForm && (
                 <form 
                   onSubmit={handleAddOccupant}
-                  className="mb-6 p-4 rounded-2xl bg-secondary/5 border border-secondary/20 space-y-4 animate-in slide-in-from-top-2 duration-200"
+                  className={`mb-6 p-4 rounded-2xl border space-y-4 animate-in slide-in-from-top-2 duration-200 ${editingHouseOccupantId ? 'bg-info/5 border-info/20' : 'bg-secondary/5 border-secondary/20'}`}
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`p-1.5 rounded-lg ${editingHouseOccupantId ? 'bg-info/20 text-info' : 'bg-secondary/20 text-secondary'}`}>
+                      {editingHouseOccupantId ? <Pencil size={12} /> : <UserPlus size={12} />}
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest opacity-70">
+                      {editingHouseOccupantId ? 'Edit Data Penghuni' : 'Tambah Penghuni Baru'}
+                    </span>
+                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="form-control col-span-2 sm:col-span-1">
                       <label className="label py-1">
@@ -654,6 +696,20 @@ export default function Houses() {
                         required
                       />
                     </div>
+                    {!addOccupantData.is_current && (
+                      <div className="form-control col-span-2 sm:col-span-2 animate-in slide-in-from-left-2 duration-200">
+                        <label className="label py-1">
+                          <span className="label-text font-black text-[10px] uppercase tracking-wider text-error font-bold">Tanggal Berakhir (Wajib jika tidak aktif)</span>
+                        </label>
+                        <input 
+                          type="date" 
+                          className="input input-bordered input-sm w-full font-bold bg-base-100 border-error/30"
+                          value={addOccupantData.end_in_date}
+                          onChange={(e) => setAddOccupantData({ ...addOccupantData, end_in_date: e.target.value })}
+                          required={!addOccupantData.is_current}
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <label className="label cursor-pointer justify-start gap-2 py-0">
@@ -667,10 +723,10 @@ export default function Houses() {
                     </label>
                     <button 
                       type="submit" 
-                      className="btn btn-secondary btn-sm font-black px-6 shadow-lg shadow-secondary/20"
+                      className={`btn btn-sm font-black px-6 shadow-lg ${editingHouseOccupantId ? 'btn-info shadow-info/20' : 'btn-secondary shadow-secondary/20'}`}
                       disabled={submitting}
                     >
-                      {submitting ? <Loader2 size={14} className="animate-spin" /> : "Simpan"}
+                      {submitting ? <Loader2 size={14} className="animate-spin" /> : (editingHouseOccupantId ? "Update" : "Simpan")}
                     </button>
                   </div>
                 </form>
@@ -698,6 +754,12 @@ export default function Houses() {
                               </span>
                               <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-wider">{ho.occupant.occupant_status}</span>
                             </div>
+                            <div className="flex items-center gap-1.5 mt-1 opacity-50">
+                              <Calendar size={10} />
+                              <span className="text-[9px] font-bold uppercase tracking-tight">
+                                {ho.start_in_date ? new Date(ho.start_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} — {ho.is_current ? 'Sekarang' : (ho.end_in_date ? new Date(ho.end_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-')}
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <div className="flex gap-1">
@@ -705,13 +767,22 @@ export default function Houses() {
                             <a 
                               href={`tel:${ho.occupant.occupant_phone_number}`}
                               className="btn btn-circle btn-ghost btn-sm text-primary"
+                              title="Hubungi"
                             >
                               <Phone size={16} />
                             </a>
                           )}
                           <button 
+                            onClick={() => handlePrepEditOccupant(ho)}
+                            className="btn btn-circle btn-ghost btn-sm text-info opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Edit"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
                             onClick={() => handleDeleteOccupant(ho.house_occupant_id)}
                             className="btn btn-circle btn-ghost btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Hapus"
                           >
                             <Trash2 size={16} />
                           </button>
