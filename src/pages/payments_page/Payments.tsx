@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { 
-  Wallet, 
-  Search, 
-  RefreshCw, 
-  Filter, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  Wallet,
+  Search,
+  RefreshCw,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
   AlertCircle,
   TrendingUp,
   Clock,
@@ -15,8 +15,11 @@ import {
   Calendar,
   Building2,
   User,
-  ExternalLink
+  Eye,
+  Plus
 } from 'lucide-react';
+import { PaymentModal } from './components/PaymentModal';
+import { PaymentDetailModal } from './components/PaymentDetailModal';
 
 interface Payment {
   payment_id: number;
@@ -45,6 +48,11 @@ interface Payment {
   payment_period_month: number;
   payment_period_year: number;
   payment_status: 'success' | 'pending' | 'failed' | 'rejected' | string | null;
+  payment_proof: string | null;
+  payment_proof_url?: string | null;
+  occupant_name: string;
+  house_name: string;
+  dues_type_name: string;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -62,6 +70,12 @@ export default function Payments() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+
   const fetchPayments = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -75,6 +89,36 @@ export default function Payments() {
     }
   }, []);
 
+  const handleSubmit = async (formData: FormData) => {
+    setSubmitting(true);
+    setFormErrors({});
+    try {
+      await api.post('/payments', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setIsModalOpen(false);
+      fetchPayments();
+    } catch (err: any) {
+      if (err.response?.status === 400 && err.response?.data) {
+        setFormErrors(err.response.data.errors || err.response.data);
+      } else {
+        setError(err.response?.data?.message || 'Gagal menyimpan iuran.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleShowDetail = async (p: Payment) => {
+    try {
+      const res = await api.get(`/payments/${p.payment_id}`);
+      setSelectedPayment(res.data.data);
+      setIsDetailModalOpen(true);
+    } catch (err: any) {
+      setError('Gagal memuat detail pembayaran.');
+    }
+  };
+
   useEffect(() => {
     fetchPayments();
   }, [fetchPayments]);
@@ -85,13 +129,13 @@ export default function Payments() {
 
   const filtered = payments.filter((p) => {
     const matchSearch =
-      p.payer_occupant.occupant_name.toLowerCase().includes(search.toLowerCase()) ||
-      p.house_occupant.house.house_name.toLowerCase().includes(search.toLowerCase()) ||
-      p.house_occupant.house.house_number.toLowerCase().includes(search.toLowerCase());
-    
-    const matchStatus = statusFilter === 'all' || 
-      (p.payment_status ? p.payment_status.toLowerCase() === statusFilter.toLowerCase() : statusFilter === 'unpaid');
-    
+      p.occupant_name.toLowerCase().includes(search.toLowerCase()) ||
+      p.house_name.toLowerCase().includes(search.toLowerCase()) ||
+      p.dues_type_name.toLowerCase().includes(search.toLowerCase());
+
+    const matchStatus = statusFilter === 'all' ||
+      ((p.payment_status && p.payment_status !== '') ? p.payment_status.toLowerCase() === statusFilter.toLowerCase() : statusFilter === 'unpaid');
+
     return matchSearch && matchStatus;
   });
 
@@ -150,7 +194,11 @@ export default function Payments() {
               <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
               Refresh
             </button>
-            <button className="btn btn-primary btn-sm gap-2 normal-case font-bold">
+            <button
+              onClick={() => { setFormErrors({}); setIsModalOpen(true); }}
+              className="btn btn-primary btn-sm gap-2 normal-case font-bold"
+            >
+              <Plus size={16} />
               Catat Iuran Baru
             </button>
           </div>
@@ -208,7 +256,7 @@ export default function Payments() {
           </div>
           <div className="flex gap-2 w-full lg:w-auto">
             <div className="join border border-base-300 w-full lg:w-auto">
-              <select 
+              <select
                 className="select select-bordered select-sm join-item bg-base-100 font-bold text-xs"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -285,13 +333,13 @@ export default function Payments() {
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shadow-inner">
-                          {p.dues_type.dues_type_name.charAt(0)}
+                          {p.dues_type_name.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-bold text-base-content">{p.dues_type.dues_type_name}</p>
+                          <p className="font-bold text-base-content">{p.dues_type_name}</p>
                           <div className="flex items-center gap-1 text-[10px] text-base-content/40 font-bold uppercase tracking-tight">
                             <Calendar size={10} />
-                            {new Date(p.payment_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            {p.payment_date ? new Date(p.payment_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Belum Bayar'}
                           </div>
                         </div>
                       </div>
@@ -300,11 +348,11 @@ export default function Payments() {
                       <div className="flex flex-col gap-0.5">
                         <div className="flex items-center gap-1.5 text-base-content font-bold">
                           <Building2 size={14} className="text-secondary" />
-                          <span>{p.house_occupant.house.house_name} {p.house_occupant.house.house_number}</span>
+                          <span>{p.house_name}</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-base-content/50 font-medium">
                           <User size={12} />
-                          <span>{p.payer_occupant.occupant_name}</span>
+                          <span>{p.occupant_name}</span>
                         </div>
                       </div>
                     </td>
@@ -324,8 +372,12 @@ export default function Payments() {
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-1">
-                        <button className="btn btn-ghost btn-square btn-xs hover:bg-primary/20 hover:text-primary transition-colors">
-                          <ExternalLink size={14} />
+                        <button
+                          onClick={() => handleShowDetail(p)}
+                          className="btn btn-ghost btn-square btn-xs hover:bg-primary/20 hover:text-primary transition-colors"
+                          title="Lihat Detail"
+                        >
+                          <Eye size={14} />
                         </button>
                       </div>
                     </td>
@@ -344,9 +396,9 @@ export default function Payments() {
             Halaman {page} dari {totalPages} — {filtered.length} transaksi
           </p>
           <div className="join shadow-sm border border-base-300">
-            <button 
-              className="join-item btn btn-xs px-4 bg-base-100 hover:bg-base-200 border-none font-bold" 
-              onClick={() => setPage((p) => Math.max(1, p - 1))} 
+            <button
+              className="join-item btn btn-xs px-4 bg-base-100 hover:bg-base-200 border-none font-bold"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
             >
               <ChevronLeft size={14} />
@@ -354,9 +406,9 @@ export default function Payments() {
             <div className="join-item flex items-center px-4 bg-base-200 text-[10px] font-black border-x border-base-300">
               {page} / {totalPages}
             </div>
-            <button 
-              className="join-item btn btn-xs px-4 bg-base-100 hover:bg-base-200 border-none font-bold" 
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))} 
+            <button
+              className="join-item btn btn-xs px-4 bg-base-100 hover:bg-base-200 border-none font-bold"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             >
               <ChevronRight size={14} />
@@ -364,6 +416,20 @@ export default function Payments() {
           </div>
         </div>
       )}
+      {/* Modals */}
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        errors={formErrors}
+      />
+
+      <PaymentDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        payment={selectedPayment}
+      />
     </div>
   );
 }
