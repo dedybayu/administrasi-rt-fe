@@ -10,7 +10,12 @@ import {
   AlertCircle,
   Hash,
   Activity,
-  UserPlus
+  UserPlus,
+  Pencil,
+  Trash2,
+  X,
+  Save,
+  Loader2
 } from 'lucide-react';
 
 interface House {
@@ -30,6 +35,16 @@ export default function Houses() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+
+  // CRUD State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [currentHouse, setCurrentHouse] = useState<House | null>(null);
+  const [formData, setFormData] = useState({
+    house_name: '',
+    house_number: ''
+  });
 
   const fetchHouses = useCallback(async () => {
     setLoading(true);
@@ -64,6 +79,68 @@ export default function Houses() {
 
   const totalOccupants = houses.reduce((acc, curr) => acc + (curr.house_occupants_count || 0), 0);
 
+  // Handlers
+  const handleOpenModal = (house: House | null = null) => {
+    setCurrentHouse(house);
+    if (house) {
+      setFormData({
+        house_name: house.house_name,
+        house_number: house.house_number
+      });
+    } else {
+      setFormData({ house_name: '', house_number: '' });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setCurrentHouse(null);
+    setFormData({ house_name: '', house_number: '' });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      if (currentHouse) {
+        await api.put(`/houses/${currentHouse.house_id}`, formData);
+      } else {
+        await api.post('/houses', formData);
+      }
+      handleCloseModal();
+      fetchHouses();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Gagal menyimpan data.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const openDeleteModal = (house: House) => {
+    setCurrentHouse(house);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setCurrentHouse(null);
+  };
+
+  const handleDelete = async () => {
+    if (!currentHouse) return;
+    setSubmitting(true);
+    try {
+      await api.delete(`/houses/${currentHouse.house_id}`);
+      closeDeleteModal();
+      fetchHouses();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Gagal menghapus data.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="p-6 lg:p-8 max-w-xxl mx-auto">
       {/* Header & Stats */}
@@ -86,8 +163,8 @@ export default function Houses() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="card bg-primary text-primary-content shadow-lg shadow-primary/20">
-            <div className="card-body p-4 flex-row items-center gap-4">
+          <div className="card bg-primary text-primary-content shadow-lg shadow-primary/20 border-none">
+            <div className="card-body p-5 flex-row items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
                 <Home size={24} />
               </div>
@@ -98,7 +175,7 @@ export default function Houses() {
             </div>
           </div>
           <div className="card bg-base-100 border border-base-300 shadow-sm">
-            <div className="card-body p-4 flex-row items-center gap-4">
+            <div className="card-body p-5 flex-row items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center">
                 <Users size={24} />
               </div>
@@ -109,7 +186,7 @@ export default function Houses() {
             </div>
           </div>
           <div className="card bg-base-100 border border-base-300 shadow-sm">
-            <div className="card-body p-4 flex-row items-center gap-4">
+            <div className="card-body p-5 flex-row items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center">
                 <Activity size={24} />
               </div>
@@ -133,13 +210,16 @@ export default function Houses() {
               <input
                 type="text"
                 placeholder="Cari berdasarkan nama pemilik atau nomor rumah..."
-                className="input input-bordered w-full pl-12 bg-base-200/50 border-none focus:bg-base-100 transition-all font-medium"
+                className="input input-bordered w-full pl-12 bg-base-200/50 border-none focus:bg-base-100 transition-all font-medium text-sm"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex gap-2 w-full md:w-auto">
-              <button className="btn btn-primary gap-2 flex-1 md:flex-none font-bold">
+              <button 
+                onClick={() => handleOpenModal()}
+                className="btn btn-primary btn-sm gap-2 flex-1 md:flex-none font-bold px-6"
+              >
                 <UserPlus size={18} />
                 Tambah Rumah
               </button>
@@ -163,7 +243,7 @@ export default function Houses() {
       {/* Loading */}
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {Array.from({ length: 2 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="card bg-base-100 border border-base-300 shadow-sm">
               <div className="card-body p-5 gap-4">
                 <div className="flex justify-between items-start">
@@ -215,7 +295,7 @@ export default function Houses() {
             >
               <div className="card-body p-5">
                 <div className="flex justify-between items-start mb-4">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-primary-content transition-colors shadow-inner">
                     <Home size={24} />
                   </div>
                   <div className="badge badge-lg bg-base-200 border-none font-black text-base-content/70">
@@ -229,7 +309,7 @@ export default function Houses() {
                   </h3>
                   <div className="flex items-center gap-1.5 mt-1 text-base-content/50">
                     <Hash size={14} />
-                    <span className="text-xs font-bold uppercase tracking-tight">KODE-{String(h.house_id).padStart(4, '0')}</span>
+                    <span className="text-xs font-bold uppercase tracking-tight">KODE-{String(h.house_number).padStart(4, '0')}</span>
                   </div>
                 </div>
 
@@ -238,9 +318,20 @@ export default function Houses() {
                     <Users size={16} className="text-secondary" />
                     <span className="text-sm font-bold">{h.house_occupants_count || 0} Penghuni</span>
                   </div>
-                  <button className="btn btn-circle btn-ghost btn-xs text-base-content/20 hover:text-primary">
-                    <ChevronRight size={16} />
-                  </button>
+                  <div className="flex gap-1">
+                    <button 
+                      onClick={() => handleOpenModal(h)}
+                      className="btn btn-ghost btn-square btn-xs text-info hover:bg-info/10 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button 
+                      onClick={() => openDeleteModal(h)}
+                      className="btn btn-ghost btn-square btn-xs text-error hover:bg-error/10 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -251,34 +342,133 @@ export default function Houses() {
       {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-12 pt-6 border-t border-base-300">
-          <p className="text-sm font-bold text-base-content/40">
-            Menampilkan {(page - 1) * ITEMS_PER_PAGE + 1} - {Math.min(page * ITEMS_PER_PAGE, filtered.length)} dari {filtered.length} rumah
+          <p className="text-xs font-bold text-base-content/30 uppercase tracking-widest">
+            Halaman {page} dari {totalPages} — {filtered.length} rumah
           </p>
           <div className="join shadow-sm border border-base-300">
             <button 
-              className="join-item btn btn-sm bg-base-100 hover:bg-base-200 border-none" 
+              className="join-item btn btn-xs px-4 bg-base-100 hover:bg-base-200 border-none font-bold" 
               onClick={() => setPage((p) => Math.max(1, p - 1))} 
               disabled={page === 1}
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={14} />
             </button>
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <button
-                key={i}
-                className={`join-item btn btn-sm border-none ${page === i + 1 ? 'btn-primary' : 'bg-base-100 hover:bg-base-200'}`}
-                onClick={() => setPage(i + 1)}
-              >
-                {i + 1}
-              </button>
-            ))}
+            <div className="join-item flex items-center px-4 bg-base-200 text-[10px] font-black border-x border-base-300">
+              {page} / {totalPages}
+            </div>
             <button 
-              className="join-item btn btn-sm bg-base-100 hover:bg-base-200 border-none" 
+              className="join-item btn btn-xs px-4 bg-base-100 hover:bg-base-200 border-none font-bold" 
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))} 
               disabled={page === totalPages}
             >
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* CRUD Modal */}
+      {isModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
+            <div className="p-6 bg-primary text-primary-content flex items-center justify-between">
+              <div>
+                <h3 className="font-black text-xl">{currentHouse ? 'Edit Rumah' : 'Tambah Rumah Baru'}</h3>
+                <p className="text-xs opacity-70 font-bold uppercase tracking-widest mt-1">Formulir Data Properti</p>
+              </div>
+              <button onClick={handleCloseModal} className="btn btn-circle btn-ghost btn-sm">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Nama Pemilik / Blok</span>
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="Contoh: Bpk. Slamet / Blok A" 
+                  className="input input-bordered w-full font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
+                  value={formData.house_name}
+                  onChange={(e) => setFormData({ ...formData, house_name: e.target.value })}
+                  required
+                />
+              </div>
+              
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Nomor Rumah</span>
+                </label>
+                <input 
+                  type="text" 
+                  placeholder="Contoh: 01" 
+                  className="input input-bordered w-full font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
+                  value={formData.house_number}
+                  onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="modal-action mt-8">
+                <button 
+                  type="button" 
+                  onClick={handleCloseModal} 
+                  className="btn btn-ghost font-bold rounded-2xl px-6"
+                  disabled={submitting}
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary font-black rounded-2xl px-8 shadow-lg shadow-primary/20"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>
+                      <Save size={18} />
+                      Simpan Data
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+          <div className="modal-backdrop bg-black/40 backdrop-blur-sm" onClick={handleCloseModal}></div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm p-6 bg-base-100 border border-base-300 shadow-2xl rounded-3xl text-center">
+            <div className="w-20 h-20 rounded-full bg-error/10 text-error flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={40} />
+            </div>
+            <h3 className="font-black text-xl text-base-content">Hapus Data Rumah?</h3>
+            <p className="py-4 text-sm text-base-content/50 font-medium">
+              Anda akan menghapus data <span className="font-bold text-base-content">{currentHouse?.house_name} #{currentHouse?.house_number}</span>. Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div className="flex gap-3 mt-4">
+              <button 
+                onClick={closeDeleteModal} 
+                className="btn btn-ghost flex-1 font-bold rounded-2xl"
+                disabled={submitting}
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleDelete} 
+                className="btn btn-error flex-1 font-black rounded-2xl text-white shadow-lg shadow-error/20"
+                disabled={submitting}
+              >
+                {submitting ? <Loader2 size={18} className="animate-spin mx-auto" /> : "Ya, Hapus"}
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop bg-black/40 backdrop-blur-sm" onClick={closeDeleteModal}></div>
         </div>
       )}
     </div>
