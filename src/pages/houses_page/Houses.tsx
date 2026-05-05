@@ -15,14 +15,34 @@ import {
   Trash2,
   X,
   Save,
-  Loader2
+  Loader2,
+  Eye,
+  Phone,
+  UserCheck,
+  History
 } from 'lucide-react';
+
+interface Occupant {
+  occupant_id: number;
+  occupant_name: string;
+  occupant_status: string;
+  occupant_phone_number?: string;
+}
+
+interface HouseOccupant {
+  house_occupant_id: number;
+  is_current: boolean;
+  start_in_date?: string;
+  end_in_date?: string;
+  occupant: Occupant;
+}
 
 interface House {
   house_id: number;
   house_name: string;
   house_number: string;
   house_occupants_count?: number;
+  house_occupants?: HouseOccupant[];
   created_at: string;
   updated_at: string;
 }
@@ -39,8 +59,17 @@ export default function Houses() {
   // CRUD State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [allOccupants, setAllOccupants] = useState<Occupant[]>([]);
   const [currentHouse, setCurrentHouse] = useState<House | null>(null);
+  const [addOccupantData, setAddOccupantData] = useState({
+    occupant_id: '',
+    start_in_date: new Date().toISOString().split('T')[0],
+    is_current: true
+  });
   const [formData, setFormData] = useState({
     house_name: '',
     house_number: ''
@@ -59,9 +88,19 @@ export default function Houses() {
     }
   }, []);
 
+  const fetchAllOccupants = useCallback(async () => {
+    try {
+      const res = await api.get('/occupants');
+      setAllOccupants(res.data.data ?? res.data);
+    } catch (err) {
+      console.error('Failed to fetch occupants:', err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchHouses();
-  }, [fetchHouses]);
+    fetchAllOccupants();
+  }, [fetchHouses, fetchAllOccupants]);
 
   useEffect(() => {
     setPage(1);
@@ -97,6 +136,64 @@ export default function Houses() {
     setIsModalOpen(false);
     setCurrentHouse(null);
     setFormData({ house_name: '', house_number: '' });
+  };
+
+  const handleOpenDetail = async (house: House) => {
+    setDetailLoading(true);
+    setCurrentHouse(house);
+    setIsDetailModalOpen(true);
+    try {
+      const res = await api.get(`/houses/${house.house_id}`);
+      setCurrentHouse(res.data.data);
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleCloseDetail = () => {
+    setIsDetailModalOpen(false);
+    setCurrentHouse(null);
+    setShowAddForm(false);
+  };
+
+  const handleAddOccupant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentHouse || !addOccupantData.occupant_id) return;
+    
+    setSubmitting(true);
+    try {
+      await api.post('/house-occupants', {
+        house_id: currentHouse.house_id,
+        ...addOccupantData
+      });
+      // Refresh detail
+      handleOpenDetail(currentHouse);
+      setShowAddForm(false);
+      setAddOccupantData({
+        occupant_id: '',
+        start_in_date: new Date().toISOString().split('T')[0],
+        is_current: true
+      });
+      fetchHouses(); // Refresh stats
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Gagal menambahkan penghuni.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteOccupant = async (houseOccupantId: number) => {
+    if (!currentHouse || !confirm('Hapus penghuni ini dari rumah?')) return;
+    
+    try {
+      await api.delete(`/house-occupants/${houseOccupantId}`);
+      handleOpenDetail(currentHouse);
+      fetchHouses(); // Refresh stats
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Gagal menghapus penghuni.');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -287,8 +384,9 @@ export default function Houses() {
 
       {/* Grid */}
       {!loading && !error && paginated.length > 0 && (
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {paginated.map((h) => (
+          {paginated.map((h, index) => (
             <div 
               key={h.house_id} 
               className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
@@ -299,7 +397,7 @@ export default function Houses() {
                     <Home size={24} />
                   </div>
                   <div className="badge badge-lg bg-base-200 border-none font-black text-base-content/70">
-                    #{h.house_number}
+                    {(page - 1) * ITEMS_PER_PAGE + index + 1}
                   </div>
                 </div>
 
@@ -308,8 +406,7 @@ export default function Houses() {
                     {h.house_name}
                   </h3>
                   <div className="flex items-center gap-1.5 mt-1 text-base-content/50">
-                    <Hash size={14} />
-                    <span className="text-xs font-bold uppercase tracking-tight">KODE-{String(h.house_number).padStart(4, '0')}</span>
+                    <span className="text-xs font-bold uppercase tracking-tight">No. Rumah: {h.house_number}</span>
                   </div>
                 </div>
 
@@ -319,6 +416,13 @@ export default function Houses() {
                     <span className="text-sm font-bold">{h.house_occupants_count || 0} Penghuni</span>
                   </div>
                   <div className="flex gap-1">
+                    <button 
+                      onClick={() => handleOpenDetail(h)}
+                      className="btn btn-ghost btn-square btn-xs text-primary hover:bg-primary/10 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Detail Rumah"
+                    >
+                      <Eye size={14} />
+                    </button>
                     <button 
                       onClick={() => handleOpenModal(h)}
                       className="btn btn-ghost btn-square btn-xs text-info hover:bg-info/10 sm:opacity-0 group-hover:opacity-100 transition-opacity"
@@ -374,7 +478,7 @@ export default function Houses() {
             <div className="p-6 bg-primary text-primary-content flex items-center justify-between">
               <div>
                 <h3 className="font-black text-xl">{currentHouse ? 'Edit Rumah' : 'Tambah Rumah Baru'}</h3>
-                <p className="text-xs opacity-70 font-bold uppercase tracking-widest mt-1">Formulir Data Properti</p>
+                <p className="text-xs opacity-70 font-bold uppercase tracking-widest mt-1">Formulir Data Rumah</p>
               </div>
               <button onClick={handleCloseModal} className="btn btn-circle btn-ghost btn-sm">
                 <X size={20} />
@@ -469,6 +573,171 @@ export default function Houses() {
             </div>
           </div>
           <div className="modal-backdrop bg-black/40 backdrop-blur-sm" onClick={closeDeleteModal}></div>
+        </div>
+      )}
+
+      {/* Detail Modal */}
+      {isDetailModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
+            <div className="p-6 bg-primary text-primary-content">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
+                    <Home size={24} />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-xl leading-tight">{currentHouse?.house_name}</h3>
+                    <p className="text-xs font-bold uppercase tracking-widest opacity-70">Detail Rumah</p>
+                  </div>
+                </div>
+                <button onClick={handleCloseDetail} className="btn btn-circle btn-ghost btn-sm">
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <div className="badge badge-outline border-white/30 text-white font-bold">
+                  No. {currentHouse?.house_number}
+                </div>
+                <div className="badge badge-outline border-white/30 text-white font-bold">
+                  {currentHouse?.house_occupants?.length || 0} Penghuni
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-base-content/50">
+                  <Users size={18} />
+                  <h4 className="font-black text-sm uppercase tracking-widest">Daftar Penghuni</h4>
+                </div>
+                <button 
+                  onClick={() => setShowAddForm(!showAddForm)}
+                  className={`btn btn-xs gap-1 font-bold rounded-lg ${showAddForm ? 'btn-ghost text-error' : 'btn-primary'}`}
+                >
+                  {showAddForm ? <X size={14} /> : <UserPlus size={14} />}
+                  {showAddForm ? 'Batal' : 'Tambah'}
+                </button>
+              </div>
+
+              {showAddForm && (
+                <form 
+                  onSubmit={handleAddOccupant}
+                  className="mb-6 p-4 rounded-2xl bg-secondary/5 border border-secondary/20 space-y-4 animate-in slide-in-from-top-2 duration-200"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="form-control col-span-2 sm:col-span-1">
+                      <label className="label py-1">
+                        <span className="label-text font-black text-[10px] uppercase tracking-wider opacity-50">Pilih Penghuni</span>
+                      </label>
+                      <select 
+                        className="select select-bordered select-sm w-full font-bold bg-base-100 border-base-300"
+                        value={addOccupantData.occupant_id}
+                        onChange={(e) => setAddOccupantData({ ...addOccupantData, occupant_id: e.target.value })}
+                        required
+                      >
+                        <option value="">-- Nama --</option>
+                        {allOccupants.map((o) => (
+                          <option key={o.occupant_id} value={o.occupant_id}>{o.occupant_name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-control col-span-2 sm:col-span-1">
+                      <label className="label py-1">
+                        <span className="label-text font-black text-[10px] uppercase tracking-wider opacity-50">Tgl Mulai</span>
+                      </label>
+                      <input 
+                        type="date" 
+                        className="input input-bordered input-sm w-full font-bold bg-base-100 border-base-300"
+                        value={addOccupantData.start_in_date}
+                        onChange={(e) => setAddOccupantData({ ...addOccupantData, start_in_date: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <label className="label cursor-pointer justify-start gap-2 py-0">
+                      <input 
+                        type="checkbox" 
+                        className="checkbox checkbox-secondary checkbox-sm rounded-md"
+                        checked={addOccupantData.is_current}
+                        onChange={(e) => setAddOccupantData({ ...addOccupantData, is_current: e.target.checked })}
+                      />
+                      <span className="label-text font-bold text-[10px] uppercase tracking-wider opacity-50">Penghuni Aktif</span>
+                    </label>
+                    <button 
+                      type="submit" 
+                      className="btn btn-secondary btn-sm font-black px-6 shadow-lg shadow-secondary/20"
+                      disabled={submitting}
+                    >
+                      {submitting ? <Loader2 size={14} className="animate-spin" /> : "Simpan"}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {detailLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                  <Loader2 size={32} className="animate-spin text-primary" />
+                  <p className="text-xs font-bold text-base-content/40 uppercase tracking-widest">Memuat Data...</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                  {currentHouse?.house_occupants && currentHouse.house_occupants.length > 0 ? (
+                    currentHouse.house_occupants.map((ho) => (
+                      <div key={ho.house_occupant_id} className="p-4 rounded-2xl bg-base-200/50 border border-base-300 flex items-center justify-between group hover:bg-base-200 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${ho.is_current ? 'bg-success/10 text-success' : 'bg-base-content/10 text-base-content/50'}`}>
+                            {ho.is_current ? <UserCheck size={20} /> : <History size={20} />}
+                          </div>
+                          <div>
+                            <p className="font-black text-base-content leading-tight">{ho.occupant.occupant_name}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`badge badge-xs font-bold uppercase ${ho.is_current ? 'badge-success' : 'badge-ghost opacity-50'}`}>
+                                {ho.is_current ? 'Aktif' : 'Riwayat'}
+                              </span>
+                              <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-wider">{ho.occupant.occupant_status}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          {ho.occupant.occupant_phone_number && (
+                            <a 
+                              href={`tel:${ho.occupant.occupant_phone_number}`}
+                              className="btn btn-circle btn-ghost btn-sm text-primary"
+                            >
+                              <Phone size={16} />
+                            </a>
+                          )}
+                          <button 
+                            onClick={() => handleDeleteOccupant(ho.house_occupant_id)}
+                            className="btn btn-circle btn-ghost btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center bg-base-200/30 rounded-3xl border border-dashed border-base-300">
+                      <Users size={32} className="text-base-content/10 mb-2" />
+                      <p className="text-xs font-bold text-base-content/30 uppercase tracking-widest">Belum Ada Penghuni</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="modal-action mt-8">
+                <button 
+                  onClick={handleCloseDetail} 
+                  className="btn btn-primary w-full font-black rounded-2xl shadow-lg shadow-primary/20"
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop bg-black/40 backdrop-blur-sm" onClick={handleCloseDetail}></div>
         </div>
       )}
     </div>

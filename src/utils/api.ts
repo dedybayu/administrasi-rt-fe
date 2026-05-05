@@ -19,34 +19,49 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    // Jangan redirect jika error 401 terjadi pada request login
-    if (error.response?.status === 401 && originalRequest.url === '/login') {
+    // Jangan redirect jika error 401 terjadi pada request login atau refresh-token
+    const isAuthRequest = originalRequest.url?.includes('/login') || originalRequest.url?.includes('/refresh-token');
+    
+    if (error.response?.status === 401 && isAuthRequest) {
       return Promise.reject(error);
     }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const refreshToken = Cookies.get('refresh_token');
+      
       if (refreshToken) {
         try {
-          const response = await axios.post(apiUrl + '/refresh-token', {}, {
+          const response = await axios.post(`${apiUrl}/refresh-token`, {}, {
             headers: { Authorization: `Bearer ${refreshToken}` }
           });
+          
           const { access_token, refresh_token: newRefresh, user } = response.data;
-          Cookies.set('token', access_token, { expires: 1 / 96 });
+          
+          // Set token to expire in 7 days (browser won't delete it, server will handle expiration)
+          Cookies.set('token', access_token, { expires: 7 });
           if (newRefresh) Cookies.set('refresh_token', newRefresh, { expires: 7 });
+          
           if (user) {
             Cookies.set('user_is_rt', String(user.is_rt ?? false), { expires: 7 });
             Cookies.set('user_name', user.username ?? '', { expires: 7 });
           }
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+
+          // Update header and retry
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${access_token}`
+          };
+          
           return api(originalRequest);
-        } catch {
+        } catch (refreshError) {
+          // Clear cookies and redirect to login if refresh fails
           Cookies.remove('token');
           Cookies.remove('refresh_token');
           Cookies.remove('user_is_rt');
           Cookies.remove('user_name');
           window.location.href = '/login';
+          return Promise.reject(refreshError);
         }
       } else {
         Cookies.remove('token');
