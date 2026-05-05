@@ -19,12 +19,12 @@ export default function Landing() {
             
             <h1 className="text-5xl md:text-7xl font-black mb-8 text-base-content leading-[1.1] tracking-tight">
               Kelola Warga Jadi <br />
-              <span className="text-primary">Luwih Gampang</span> & Transparan
+              <span className="text-primary">Lebih Mudah</span> & Transparan
             </h1>
 
             <p className="text-lg md:text-xl text-base-content/60 mb-10 max-w-2xl mx-auto font-medium">
-              Sistem administrasi RT digital kanggo ngatur data warga, iuran bulanan, 
-              lan laporan warga kanthi rapi ing siji platform.
+              Sistem administrasi RT digital untuk mengatur data warga, iuran bulanan, 
+              dan laporan warga dengan rapi dalam satu platform.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -46,10 +46,10 @@ export default function Landing() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
-                Fitur Unggulan Kita
+                Fitur Unggulan Kami
               </h2>
               <p className="text-base-content/50 text-lg font-medium">
-                Dirancang khusus kanggo kebutuhan Ketua RT lan warga supaya urusan lingkungan dadi luwih efisien.
+                Dirancang khusus untuk kebutuhan Ketua RT dan warga agar urusan lingkungan menjadi lebih efisien.
               </p>
             </div>
             <div className="hidden md:block h-px flex-1 bg-base-300 mx-12 mb-4" />
@@ -59,28 +59,28 @@ export default function Landing() {
             <Feature
               icon={<Users size={24} />}
               title="Data Warga Digital"
-              desc="Simpen kabeh data penghuni lan status omah kanthi aman lan gampang diakses."
+              desc="Simpan semua data penghuni dan status rumah dengan aman dan mudah diakses."
               color="text-primary"
               bg="bg-primary/10"
             />
             <Feature
               icon={<Wallet size={24} />}
               title="Manajemen Iuran"
-              desc="Pantau pembayaran iuran bulanan warga kanthi otomatis lan transparan."
+              desc="Pantau pembayaran iuran bulanan warga secara otomatis dan transparan."
               color="text-success"
               bg="bg-success/10"
             />
             <Feature
               icon={<Bell size={24} />}
               title="Laporan Warga"
-              desc="Warga iso ngirim laporan utawa keluhan langsung lewat sistem menyang Ketua RT."
+              desc="Warga dapat mengirim laporan atau keluhan langsung melalui sistem kepada Ketua RT."
               color="text-warning"
               bg="bg-warning/10"
             />
             <Feature
               icon={<Shield size={24} />}
               title="Keamanan Data"
-              desc="Data warga dilindungi nganggo sistem enkripsi standar industri."
+              desc="Data warga dilindungi dengan sistem enkripsi standar industri."
               color="text-error"
               bg="bg-error/10"
             />
@@ -100,12 +100,12 @@ export default function Landing() {
               
               <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tight leading-tight">
                 Membangun Komunitas <br />
-                Sing Luwih Cerdas
+                Yang Lebih Cerdas
               </h2>
 
               <p className="text-base-content/70 text-lg leading-relaxed mb-6 font-medium">
-                E-RT Digital digawe kanggo mbantu Ketua RT lan warga ngatur urusan lingkungan
-                nganggo teknologi sing gampang digunakake dening kabeh kalangan.
+                E-RT Digital dibuat untuk membantu Ketua RT dan warga mengatur urusan lingkungan
+                menggunakan teknologi yang mudah digunakan oleh semua kalangan.
               </p>
 
               <div className="space-y-4">
@@ -114,8 +114,8 @@ export default function Landing() {
                     <Clock size={18} />
                   </div>
                   <div>
-                    <h4 className="font-bold">Efisien Waktu</h4>
-                    <p className="text-sm text-base-content/60">Ora perlu maneh nulis manual ing buku kas sing kandel.</p>
+                    <h4 className="font-bold">Efisiensi Waktu</h4>
+                    <p className="text-sm text-base-content/60">Tidak perlu lagi menulis manual di buku kas yang tebal.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -124,7 +124,7 @@ export default function Landing() {
                   </div>
                   <div>
                     <h4 className="font-bold">Transparansi Dana</h4>
-                    <p className="text-sm text-base-content/60">Warga iso weruh laporan keuangan RT kanthi terbuka.</p>
+                    <p className="text-sm text-base-content/60">Warga dapat melihat laporan keuangan RT secara terbuka.</p>
                   </div>
                 </div>
               </div>
@@ -138,18 +138,18 @@ export default function Landing() {
                     <div className="w-16 h-16 bg-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/30">
                       <Home size={32} className="text-primary-content" />
                     </div>
-                    <h3 className="text-3xl font-black mb-4 tracking-tight">Visi Kita</h3>
+                    <h3 className="text-3xl font-black mb-4 tracking-tight">Visi Kami</h3>
                     <p className="text-base-content/70 text-lg mb-8 italic">
-                      "Dadi pionir digitalisasi administrasi lingkungan ing Indonesia sing gampang, terjangkau, lan dipercaya."
+                      "Menjadi pionir digitalisasi administrasi lingkungan di Indonesia yang mudah, terjangkau, dan terpercaya."
                     </p>
                     
-                    <div className="divider">Misi Kita</div>
+                    <div className="divider">Misi Kami</div>
                     
                     <ul className="space-y-4 mt-6">
                       {[
-                        'Nyederhanakake manajemen data warga',
-                        'Ngoptimalkan transparansi iuran kas RT',
-                        'Nyedhiyakake platform komunikasi sing efektif'
+                        'Menyederhanakan manajemen data warga',
+                        'Mengoptimalkan transparansi iuran kas RT',
+                        'Menyediakan platform komunikasi yang efektif'
                       ].map((misi, i) => (
                         <li key={i} className="flex items-center gap-3 font-bold text-base-content/80">
                           <div className="w-2 h-2 rounded-full bg-primary" />

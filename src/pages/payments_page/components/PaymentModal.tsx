@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Save, Loader2, Wallet, Calendar, User, Building2, Upload, IdCard, Image as ImageIcon, CheckCircle2, AlertCircle, Receipt } from 'lucide-react';
+import { X, Save, Loader2, Wallet, Calendar, Building2, Upload, Image as ImageIcon, AlertCircle, Receipt } from 'lucide-react';
 import api from '../../../utils/api';
 
 interface DuesType {

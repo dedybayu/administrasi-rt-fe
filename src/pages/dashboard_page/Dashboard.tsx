@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { Wallet, TrendingUp, TrendingDown, Calendar, AlertCircle, ChevronRight, Activity } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Calendar, AlertCircle, ChevronRight, Activity, Shield } from 'lucide-react';
 
 interface MonthlyData {
   month: number;
@@ -245,13 +245,27 @@ export default function Dashboard() {
 
               <div className="divider my-0" />
 
-              <div className="bg-base-200/50 rounded-2xl p-4">
-                <p className="text-[10px] font-black text-base-content/40 uppercase mb-2">Prediksi Kas Bulan Depan</p>
-                <div className="flex items-end justify-between">
-                   <p className="text-xl font-black text-primary">Stabil</p>
-                   <span className="text-[10px] font-bold text-success">+2.4% vs Ltg</span>
+              {report && (report.total_balance < 0 ? (
+                <div className="bg-error/10 border border-error/20 rounded-2xl p-4 flex items-center gap-4 animate-pulse">
+                  <div className="w-10 h-10 rounded-full bg-error text-error-content flex items-center justify-center shrink-0">
+                    <AlertCircle size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-error uppercase tracking-widest">Peringatan Saldo</p>
+                    <p className="text-xs font-bold text-error/80">Saldo kas RT sedang kritis! Segera tinjau pengeluaran.</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="bg-success/10 border border-success/20 rounded-2xl p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-success text-success-content flex items-center justify-center shrink-0">
+                    <Shield size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-success uppercase tracking-widest">Status Saldo Aman</p>
+                    <p className="text-xs font-bold text-success/80">Kondisi keuangan RT saat ini dalam keadaan sehat.</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
