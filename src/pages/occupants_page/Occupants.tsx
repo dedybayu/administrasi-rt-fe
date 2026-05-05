@@ -67,7 +67,7 @@ export default function Occupants() {
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+    <div className="p-6 lg:p-8 max-w-xxl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
@@ -176,13 +176,9 @@ export default function Occupants() {
               <div className="card-body p-5">
                 {/* Header */}
                 <div className="flex items-start gap-3 mb-3">
-                  {o.occupant_ktp_url ? (
-                    <img src={o.occupant_ktp_url} alt={o.occupant_name} className="w-14 h-14 rounded-2xl object-cover border border-base-300 shrink-0" />
-                  ) : (
-                    <div className={`w-14 h-14 rounded-2xl ${getAvatarColor(o.occupant_id)} text-white text-lg font-bold flex items-center justify-center shrink-0`}>
-                      {getInitials(o.occupant_name)}
-                    </div>
-                  )}
+                  <div className={`w-14 h-14 rounded-2xl ${getAvatarColor(o.occupant_id)} text-white text-lg font-bold flex items-center justify-center shrink-0 shadow-sm border border-white/10`}>
+                    {getInitials(o.occupant_name)}
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-bold truncate text-base" title={o.occupant_name}>{o.occupant_name}</p>
                     <span className={`badge badge-sm mt-1 font-semibold ${statusBadge(o.occupant_status)}`}>{o.occupant_status}</span>

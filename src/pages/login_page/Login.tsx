@@ -37,46 +37,55 @@ export default function Login() {
   };
 
   return (
-    <main className="min-h-screen bg-base-200 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+    <main className="min-h-screen bg-base-200 flex items-center justify-center px-4 pt-24 pb-12">
+      <div className="w-full max-w-md relative">
+        {/* Decorative background blobs */}
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-secondary/10 rounded-full blur-3xl" />
+
         {/* Logo/Brand Section */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-lg">
-            <Building2 size={32} className="text-primary-content" />
+        <div className="text-center mb-10 flex flex-col items-center relative z-10">
+          <div className="w-20 h-20 rounded-[2rem] bg-primary flex items-center justify-center mb-6 shadow-2xl shadow-primary/40 group hover:rotate-6 transition-transform duration-500">
+            <Building2 size={40} className="text-primary-content" />
           </div>
-          <h1 className="text-3xl font-bold text-primary">
+          <h1 className="text-4xl font-black text-primary tracking-tight">
             E-RT Digital
           </h1>
-          <p className="text-base-content/60 font-medium mt-1">
-            Administrasi Lingkungan Modern
+          <p className="text-base-content/50 font-bold mt-2 uppercase tracking-widest text-[10px]">
+            Sistem Administrasi Lingkungan
           </p>
         </div>
 
         {/* Login Card */}
-        <div className="card bg-base-100 shadow-xl border border-base-300">
-          <div className="card-body p-8">
-            <h2 className="card-title text-2xl font-bold mb-1">Selamat Datang</h2>
-            <p className="text-base-content/50 text-sm mb-6">Silakan masuk untuk melanjutkan</p>
+        <div className="card bg-base-100 shadow-2xl rounded-[2.5rem] border border-base-300 relative z-10 overflow-hidden">
+          {/* Top accent line */}
+          <div className="h-2 w-full bg-gradient-to-r from-primary to-secondary" />
+          
+          <div className="card-body p-8 lg:p-10">
+            <div className="mb-8">
+              <h2 className="text-3xl font-black mb-2 tracking-tight">Selamat Datang</h2>
+              <p className="text-base-content/50 font-medium text-sm">Akses portal administrasi RT wilayah Anda.</p>
+            </div>
 
             {/* Error Alert */}
             {error && (
-              <div role="alert" className="alert alert-error mb-6 py-3">
-                <AlertCircle size={18} />
-                <span className="text-sm font-medium">{error}</span>
+              <div role="alert" className="alert alert-error mb-8 rounded-2xl border-none text-white shadow-lg shadow-error/20 font-bold py-4">
+                <AlertCircle size={20} />
+                <span className="text-sm">{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="form-control w-full">
-                <label className="label">
-                  <span className="label-text font-semibold">Username</span>
+                <label className="label py-1">
+                  <span className="label-text font-black text-xs uppercase tracking-widest text-base-content/40">Username</span>
                 </label>
-                <label className="input input-bordered flex items-center gap-3 w-full">
-                  <User size={18} className="text-base-content/40" />
+                <label className="input input-bordered h-14 rounded-2xl flex items-center gap-4 w-full border-base-300 focus-within:border-primary transition-all">
+                  <User size={20} className="text-base-content/30" />
                   <input
                     type="text"
-                    placeholder="Masukkan username"
-                    className="grow"
+                    placeholder="Contoh: ketuart"
+                    className="grow font-bold text-sm"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -85,16 +94,18 @@ export default function Login() {
               </div>
 
               <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Password</span>
-                  <a href="#" className="label-text-alt link link-primary">Lupa Password?</a>
-                </label>
-                <label className="input input-bordered flex items-center gap-3 w-full">
-                  <Lock size={18} className="text-base-content/40" />
+                <div className="flex justify-between items-center mb-1">
+                  <label className="label py-1">
+                    <span className="label-text font-black text-xs uppercase tracking-widest text-base-content/40">Password</span>
+                  </label>
+                  <a href="#" className="text-[10px] font-black uppercase tracking-wider text-primary hover:underline">Lupa Password?</a>
+                </div>
+                <label className="input input-bordered h-14 rounded-2xl flex items-center gap-4 w-full border-base-300 focus-within:border-primary transition-all">
+                  <Lock size={20} className="text-base-content/30" />
                   <input
                     type="password"
                     placeholder="••••••••"
-                    className="grow"
+                    className="grow font-bold tracking-widest"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -105,32 +116,39 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary w-full mt-4"
+                className="btn btn-primary h-14 rounded-2xl w-full mt-6 text-sm font-black uppercase tracking-widest shadow-xl shadow-primary/30"
               >
                 {loading ? (
                   <span className="loading loading-spinner"></span>
                 ) : (
                   <>
-                    Masuk Sekarang
-                    <ArrowRight size={18} />
+                    Masuk Ke Portal
+                    <ArrowRight size={20} className="ml-1" />
                   </>
                 )}
               </button>
             </form>
 
-            <div className="divider text-xs text-base-content/30 mt-8">BANTUAN</div>
+            <div className="divider text-[10px] font-black uppercase tracking-[0.2em] text-base-content/20 my-10">Pusat Bantuan</div>
 
-            <p className="text-center text-sm text-base-content/50">
-              Belum punya akun?{' '}
-              <a href="#" className="link link-primary font-semibold">Hubungi Ketua RT</a>
+            <p className="text-center text-sm font-medium text-base-content/60">
+              Belum terdaftar?{' '}
+              <a href="#" className="text-primary font-black hover:underline">Hubungi Ketua RT</a>
             </p>
           </div>
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-base-content/30 text-xs mt-8">
-          © 2026 E-RT Digital Ecosystem
-        </p>
+        <div className="flex flex-col items-center gap-4 mt-12">
+          <div className="flex gap-6">
+            <a href="/" className="text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-primary transition-colors">Beranda</a>
+            <a href="#" className="text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-primary transition-colors">Privasi</a>
+            <a href="#" className="text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-primary transition-colors">Bantuan</a>
+          </div>
+          <p className="text-base-content/20 text-[10px] font-bold uppercase tracking-widest">
+            © 2026 E-RT Digital Ecosystem
+          </p>
+        </div>
       </div>
     </main>
   );

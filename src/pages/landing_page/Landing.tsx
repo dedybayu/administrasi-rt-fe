@@ -1,185 +1,195 @@
+import { Home, Users, Wallet, Info, ArrowRight, Shield, Bell, Clock } from 'lucide-react';
+
 export default function Landing() {
   return (
-    <main>
+    <main className="pt-16">
       {/* HERO */}
-      <section id="home" className="hero min-h-[90vh] bg-base-100 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20" />
+      <section id="home" className="hero min-h-[85vh] bg-base-100 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
+        
+        {/* Decorative elements */}
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
 
-        <div className="hero-content text-center relative z-10">
-          <div className="max-w-3xl">
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-base-content leading-tight">
-              Ngatur Penggawean,<br className="hidden md:block" />
-              Ora Ribet
-            </h2>
+        <div className="hero-content text-center relative z-10 px-6">
+          <div className="max-w-4xl">
+            <div className="badge badge-primary badge-outline font-bold mb-6 py-3 px-4 animate-bounce">
+              Digitalisasi Administrasi RT v2.0
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-black mb-8 text-base-content leading-[1.1] tracking-tight">
+              Kelola Warga Jadi <br />
+              <span className="text-primary">Luwih Gampang</span> & Transparan
+            </h1>
 
-            <p className="text-lg text-base-content/70 mb-8">
-              Gawean iso mbantu tim ngatur tugas, ngawasi progres,
-              lan kolaborasi luwih rapi ing siji platform.
+            <p className="text-lg md:text-xl text-base-content/60 mb-10 max-w-2xl mx-auto font-medium">
+              Sistem administrasi RT digital kanggo ngatur data warga, iuran bulanan, 
+              lan laporan warga kanthi rapi ing siji platform.
             </p>
 
-            <div className="flex justify-center gap-4">
-              <button className="btn btn-primary btn-lg">
-                Mulai Gratis
-              </button>
-              <button className="btn btn-outline btn-lg">
-                Pelajari
-              </button>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <a href="/login" className="btn btn-primary btn-lg rounded-2xl shadow-xl shadow-primary/20 px-8">
+                Mulai Sekarang
+                <ArrowRight size={20} />
+              </a>
+              <a href="#features" className="btn btn-ghost btn-lg rounded-2xl border border-base-300">
+                Pelajari Fitur
+              </a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FITUR KAMI */}
-      <section className="bg-base-100" id="features">
-        <div className="max-w-7xl mx-auto px-6 py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Fitur Kami
-            </h2>
-            <p className="text-base-content/70 max-w-2xl mx-auto">
-              Dirancang supaya tim iso kerja luwih efisien, fokus,
-              lan terorganisir tanpa ribet.
-            </p>
+      {/* FITUR UTAMA */}
+      <section className="bg-base-100 relative z-10" id="features">
+        <div className="max-w-7xl mx-auto px-6 py-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tight">
+                Fitur Unggulan Kita
+              </h2>
+              <p className="text-base-content/50 text-lg font-medium">
+                Dirancang khusus kanggo kebutuhan Ketua RT lan warga supaya urusan lingkungan dadi luwih efisien.
+              </p>
+            </div>
+            <div className="hidden md:block h-px flex-1 bg-base-300 mx-12 mb-4" />
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Feature
-              title="Board Interaktif"
-              desc="Kelola proyek nganggo tampilan board sing gampang dipahami."
+              icon={<Users size={24} />}
+              title="Data Warga Digital"
+              desc="Simpen kabeh data penghuni lan status omah kanthi aman lan gampang diakses."
+              color="text-primary"
+              bg="bg-primary/10"
             />
             <Feature
-              title="Deadline Reminder"
-              desc="Notifikasi otomatis supaya ora kelalen deadline."
+              icon={<Wallet size={24} />}
+              title="Manajemen Iuran"
+              desc="Pantau pembayaran iuran bulanan warga kanthi otomatis lan transparan."
+              color="text-success"
+              bg="bg-success/10"
             />
             <Feature
-              title="Role & Akses"
-              desc="Atur hak akses anggota tim sesuai peran."
+              icon={<Bell size={24} />}
+              title="Laporan Warga"
+              desc="Warga iso ngirim laporan utawa keluhan langsung lewat sistem menyang Ketua RT."
+              color="text-warning"
+              bg="bg-warning/10"
             />
             <Feature
-              title="Laporan Proyek"
-              desc="Ringkasan progres lan performa proyek kanthi visual."
+              icon={<Shield size={24} />}
+              title="Keamanan Data"
+              desc="Data warga dilindungi nganggo sistem enkripsi standar industri."
+              color="text-error"
+              bg="bg-error/10"
             />
           </div>
         </div>
       </section>
 
-      {/* TENTANG KAMI */}
+      {/* TENTANG KAMI / VISI MISI */}
       <section className="bg-base-200" id="about">
-        <div className="max-w-5xl mx-auto px-6 py-20">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Tentang Kami
+        <div className="max-w-6xl mx-auto px-6 py-24">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="inline-flex items-center gap-2 text-primary font-black uppercase tracking-widest text-xs mb-6">
+                <div className="w-8 h-px bg-primary" />
+                Tentang E-RT Digital
+              </div>
+              
+              <h2 className="text-4xl md:text-5xl font-black mb-8 tracking-tight leading-tight">
+                Membangun Komunitas <br />
+                Sing Luwih Cerdas
               </h2>
 
-              <p className="text-base-content/70 leading-relaxed mb-4">
-                Gawean digawe kanggo mbantu UMKM, startup,
-                lan tim mahasiswa supaya luwih gampang
-                ngatur proyek lan kolaborasi.
+              <p className="text-base-content/70 text-lg leading-relaxed mb-6 font-medium">
+                E-RT Digital digawe kanggo mbantu Ketua RT lan warga ngatur urusan lingkungan
+                nganggo teknologi sing gampang digunakake dening kabeh kalangan.
               </p>
 
-              <p className="text-base-content/70 leading-relaxed mb-8">
-                Misi kita sederhana: nggawe sistem manajemen tugas
-                sing simpel, cepet, lan ora mbingungake.
-              </p>
-
-              {/* SOCIAL MEDIA */}
-              <div>
-                <h3 className="font-semibold mb-4">Sosial Media</h3>
-
-                <div className="flex gap-4">
-                  <a
-                    href="#"
-                    className="btn btn-circle btn-outline hover:btn-primary transition-all"
-                  >
-                    {/* Instagram */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="5" strokeWidth="2" />
-                      <circle cx="12" cy="12" r="4" strokeWidth="2" />
-                      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
-                    </svg>
-                  </a>
-
-                  <a
-                    href="#"
-                    className="btn btn-circle btn-outline hover:btn-primary transition-all"
-                  >
-                    {/* Twitter/X */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M18.244 2H21l-6.56 7.49L22 22h-6.828l-5.35-7.003L3.9 22H1.14l7.02-8.012L2 2h6.92l4.84 6.354L18.244 2z" />
-                    </svg>
-                  </a>
-
-                  <a
-                    href="#"
-                    className="btn btn-circle btn-outline hover:btn-primary transition-all"
-                  >
-                    {/* LinkedIn */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="w-5 h-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1s2.49 1.12 2.49 2.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.07c.67-1.27 2.3-2.6 4.73-2.6 5.06 0 6 3.33 6 7.65V24h-5v-7.7c0-1.84-.03-4.2-2.56-4.2-2.56 0-2.95 2-2.95 4.07V24h-5V8z" />
-                    </svg>
-                  </a>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="mt-1 bg-primary/20 p-1.5 rounded-lg text-primary">
+                    <Clock size={18} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold">Efisien Waktu</h4>
+                    <p className="text-sm text-base-content/60">Ora perlu maneh nulis manual ing buku kas sing kandel.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="mt-1 bg-success/20 p-1.5 rounded-lg text-success">
+                    <Shield size={18} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold">Transparansi Dana</h4>
+                    <p className="text-sm text-base-content/60">Warga iso weruh laporan keuangan RT kanthi terbuka.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-
-            <div className="card bg-base-100 shadow-lg">
-              <div className="card-body">
-                <h3 className="card-title">
-                  Visi
-                </h3>
-                <p className="text-base-content/70">
-                  Dadi platform manajemen kerja sing
-                  gampang digunakake lan terjangkau.
-                </p>
-
-                <div className="divider"></div>
-
-                <h3 className="card-title">
-                  Misi
-                </h3>
-                <ul className="list-disc list-inside text-base-content/70 space-y-2">
-                  <li>Nyederhanakake manajemen proyek</li>
-                  <li>Ngoptimalkan kolaborasi tim</li>
-                  <li>Nyedhiyakake fitur sing relevan</li>
-                </ul>
+            <div className="order-1 lg:order-2">
+              <div className="relative">
+                <div className="absolute -inset-4 bg-primary/20 rounded-[3rem] blur-2xl opacity-50" />
+                <div className="card bg-base-100 shadow-2xl rounded-[3rem] overflow-hidden border border-base-300 relative">
+                  <div className="card-body p-10">
+                    <div className="w-16 h-16 bg-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/30">
+                      <Home size={32} className="text-primary-content" />
+                    </div>
+                    <h3 className="text-3xl font-black mb-4 tracking-tight">Visi Kita</h3>
+                    <p className="text-base-content/70 text-lg mb-8 italic">
+                      "Dadi pionir digitalisasi administrasi lingkungan ing Indonesia sing gampang, terjangkau, lan dipercaya."
+                    </p>
+                    
+                    <div className="divider">Misi Kita</div>
+                    
+                    <ul className="space-y-4 mt-6">
+                      {[
+                        'Nyederhanakake manajemen data warga',
+                        'Ngoptimalkan transparansi iuran kas RT',
+                        'Nyedhiyakake platform komunikasi sing efektif'
+                      ].map((misi, i) => (
+                        <li key={i} className="flex items-center gap-3 font-bold text-base-content/80">
+                          <div className="w-2 h-2 rounded-full bg-primary" />
+                          {misi}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
     </main>
-  )
+  );
 }
 
-function Feature({ title, desc }) {
+interface FeatureProps {
+  title: string;
+  desc: string;
+  icon: React.ReactNode;
+  color: string;
+  bg: string;
+}
+
+function Feature({ title, desc, icon, color, bg }: FeatureProps) {
   return (
-    <div className="card bg-base-100 shadow-sm hover:shadow-lg transition-all">
-      <div className="card-body">
-        <h3 className="card-title text-base-content">
+    <div className="card bg-base-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 border border-base-200 group rounded-[2.5rem]">
+      <div className="card-body p-8">
+        <div className={`w-14 h-14 rounded-2xl ${bg} ${color} flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-300`}>
+          {icon}
+        </div>
+        <h3 className="text-xl font-black mb-3 group-hover:text-primary transition-colors">
           {title}
         </h3>
-        <p className="text-base-content/70 leading-relaxed">
+        <p className="text-base-content/60 leading-relaxed font-medium">
           {desc}
         </p>
       </div>
     </div>
-  )
+  );
 }

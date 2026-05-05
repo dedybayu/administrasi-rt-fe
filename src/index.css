@@ -1,6 +1,57 @@
 @import "tailwindcss";
 
-@plugin "daisyui" {
-  themes: light, dark;
-  darkTheme: dark;
+@plugin "daisyui";
+
+/* ===== DaisyUI Theme: Light ===== */
+[data-theme="light"] {
+  --color-primary: oklch(0.55 0.22 264);
+  --color-primary-content: oklch(1 0 0);
+  --color-secondary: oklch(0.60 0.19 190);
+  --color-secondary-content: oklch(1 0 0);
+  --color-accent: oklch(0.65 0.18 142);
+  --color-accent-content: oklch(1 0 0);
+  --color-neutral: oklch(0.32 0.02 265);
+  --color-neutral-content: oklch(0.98 0 0);
+  --color-base-100: oklch(1 0 0);
+  --color-base-200: oklch(0.96 0.005 240);
+  --color-base-300: oklch(0.92 0.01 240);
+  --color-base-content: oklch(0.22 0.02 265);
+  --color-info: oklch(0.62 0.20 230);
+  --color-info-content: oklch(1 0 0);
+  --color-success: oklch(0.60 0.20 145);
+  --color-success-content: oklch(1 0 0);
+  --color-warning: oklch(0.75 0.18 80);
+  --color-warning-content: oklch(0.15 0 0);
+  --color-error: oklch(0.60 0.22 25);
+  --color-error-content: oklch(1 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+}
+
+/* ===== DaisyUI Theme: Dark ===== */
+[data-theme="dark"] {
+  --color-primary: oklch(45.116% 0.16082 262.266);
+  --color-primary-content: oklch(1 0 0);
+  --color-secondary: oklch(0.65 0.19 190);
+  --color-secondary-content: oklch(1 0 0);
+  --color-accent: oklch(0.68 0.18 142);
+  --color-accent-content: oklch(1 0 0);
+  --color-neutral: oklch(0.25 0.015 265);
+  --color-neutral-content: oklch(0.90 0 0);
+  --color-base-100: oklch(0.22 0.01 265);
+  --color-base-200: oklch(0.19 0.01 265);
+  --color-base-300: oklch(0.16 0.01 265);
+  --color-base-content: oklch(0.92 0.005 240);
+  --color-info: oklch(0.62 0.20 230);
+  --color-info-content: oklch(1 0 0);
+  --color-success: oklch(0.60 0.20 145);
+  --color-success-content: oklch(1 0 0);
+  --color-warning: oklch(0.75 0.18 80);
+  --color-warning-content: oklch(0.15 0 0);
+  --color-error: oklch(0.65 0.22 25);
+  --color-error-content: oklch(1 0 0);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
 }

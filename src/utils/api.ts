@@ -29,8 +29,8 @@ api.interceptors.response.use(
       const refreshToken = Cookies.get('refresh_token');
       if (refreshToken) {
         try {
-          const response = await axios.post(apiUrl + '/refresh-token', {
-            refresh_token: refreshToken,
+          const response = await axios.post(apiUrl + '/refresh-token', {}, {
+            headers: { Authorization: `Bearer ${refreshToken}` }
           });
           const { access_token, refresh_token: newRefresh, user } = response.data;
           Cookies.set('token', access_token, { expires: 1 / 96 });
