@@ -44,7 +44,7 @@ interface Payment {
   payment_date: string;
   payment_period_month: number;
   payment_period_year: number;
-  payment_status: 'success' | 'pending' | 'failed' | 'rejected' | string;
+  payment_status: 'success' | 'pending' | 'failed' | 'rejected' | string | null;
 }
 
 const ITEMS_PER_PAGE = 10;
@@ -89,7 +89,8 @@ export default function Payments() {
       p.house_occupant.house.house_name.toLowerCase().includes(search.toLowerCase()) ||
       p.house_occupant.house.house_number.toLowerCase().includes(search.toLowerCase());
     
-    const matchStatus = statusFilter === 'all' || p.payment_status.toLowerCase() === statusFilter.toLowerCase();
+    const matchStatus = statusFilter === 'all' || 
+      (p.payment_status ? p.payment_status.toLowerCase() === statusFilter.toLowerCase() : statusFilter === 'unpaid');
     
     return matchSearch && matchStatus;
   });
@@ -99,11 +100,12 @@ export default function Payments() {
 
   const stats = {
     total: payments.filter(p => p.payment_status === 'success').reduce((acc, curr) => acc + parseFloat(curr.payment_amount), 0),
-    pending: payments.filter(p => p.payment_status === 'pending').length,
+    pending: payments.filter(p => p.payment_status === 'pending' || p.payment_status === null).length,
     failed: payments.filter(p => p.payment_status === 'failed' || p.payment_status === 'rejected').length,
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | null) => {
+    if (!status) return 'badge-ghost opacity-60';
     const s = status.toLowerCase();
     if (s === 'success' || s === 'paid') return 'badge-success text-success-content';
     if (s === 'pending') return 'badge-warning text-warning-content';
@@ -111,7 +113,8 @@ export default function Payments() {
     return 'badge-ghost';
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string | null) => {
+    if (!status) return <Clock size={14} className="opacity-50" />;
     const s = status.toLowerCase();
     if (s === 'success' || s === 'paid') return <CheckCircle2 size={14} />;
     if (s === 'pending') return <Clock size={14} />;
@@ -213,6 +216,7 @@ export default function Payments() {
                 <option value="all">Semua Status</option>
                 <option value="success">Berhasil</option>
                 <option value="pending">Tertunda</option>
+                <option value="unpaid">Tertagih</option>
                 <option value="failed">Gagal</option>
               </select>
               <button className="btn btn-sm join-item bg-base-200 border-base-300">
@@ -315,7 +319,7 @@ export default function Payments() {
                     <td>
                       <div className={`badge badge-sm font-black gap-1.5 py-3 ${getStatusBadge(p.payment_status)}`}>
                         {getStatusIcon(p.payment_status)}
-                        <span className="uppercase text-[9px] tracking-wider">{p.payment_status}</span>
+                        <span className="uppercase text-[9px] tracking-wider">{p.payment_status || 'Tertagih'}</span>
                       </div>
                     </td>
                     <td className="text-center">

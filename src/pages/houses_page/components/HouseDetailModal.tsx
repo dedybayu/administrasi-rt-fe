@@ -28,6 +28,7 @@ interface HouseDetailModalProps {
     start_in_date: string;
     end_in_date: string;
     is_current: boolean;
+    is_head_family: boolean;
   };
   setAddOccupantData: (data: any) => void;
   allOccupants: Occupant[];
@@ -99,7 +100,8 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                     occupant_id: '',
                     start_in_date: new Date().toISOString().split('T')[0],
                     end_in_date: '',
-                    is_current: true
+                    is_current: true,
+                    is_head_family: false
                   });
                 }
               }}
@@ -130,14 +132,18 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                   </label>
                   <select 
                     className="select select-bordered select-sm w-full font-bold bg-base-100 border-base-300"
-                    value={addOccupantData.occupant_id}
+                    value={addOccupantData.occupant_id || ''}
                     onChange={(e) => setAddOccupantData({ ...addOccupantData, occupant_id: e.target.value })}
                     required
                   >
                     <option value="">-- Nama --</option>
-                    {allOccupants.map((o) => (
-                      <option key={o.occupant_id} value={o.occupant_id}>{o.occupant_name}</option>
-                    ))}
+                    {allOccupants && allOccupants.length > 0 ? (
+                      allOccupants.map((o) => (
+                        <option key={o.occupant_id} value={String(o.occupant_id)}>{o.occupant_name}</option>
+                      ))
+                    ) : (
+                      <option disabled>Memuat data penghuni...</option>
+                    )}
                   </select>
                 </div>
                 <div className="form-control col-span-2 sm:col-span-1">
@@ -177,6 +183,22 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                   />
                   <span className="label-text font-bold text-[10px] uppercase tracking-wider opacity-50">Penghuni Aktif</span>
                 </label>
+                <label className="label cursor-pointer justify-start gap-2 py-0">
+                  <input 
+                    type="checkbox" 
+                    className="checkbox checkbox-primary checkbox-sm rounded-md"
+                    checked={addOccupantData.is_head_family}
+                    onChange={(e) => setAddOccupantData({ ...addOccupantData, is_head_family: e.target.checked })}
+                    disabled={
+                      editingHouseOccupantId !== null && 
+                      addOccupantData.is_head_family && 
+                      (currentHouse?.house_occupants?.filter(ho => ho.is_current).length || 0) <= 1
+                    }
+                  />
+                  <span className="label-text font-bold text-[10px] uppercase tracking-wider opacity-50">
+                    Kepala Keluarga {editingHouseOccupantId !== null && addOccupantData.is_head_family && (currentHouse?.house_occupants?.filter(ho => ho.is_current).length || 0) <= 1 && "(Wajib)"}
+                  </span>
+                </label>
                 <button 
                   type="submit" 
                   className={`btn btn-sm font-black px-6 shadow-lg ${editingHouseOccupantId ? 'btn-info shadow-info/20' : 'btn-secondary shadow-secondary/20'}`}
@@ -208,6 +230,9 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                           <span className={`badge badge-xs font-bold uppercase ${ho.is_current ? 'badge-success' : 'badge-ghost opacity-50'}`}>
                             {ho.is_current ? 'Aktif' : 'Riwayat'}
                           </span>
+                          {!!ho.is_head_family && (
+                            <span className="badge badge-xs badge-primary font-bold uppercase">Kepala Keluarga</span>
+                          )}
                           <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-wider">{ho.occupant.occupant_status}</span>
                         </div>
                         <div className="flex items-center gap-1.5 mt-1 opacity-50">

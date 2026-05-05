@@ -10,7 +10,6 @@ import {
   Tooltip, 
   ResponsiveContainer,
   Legend,
-  Cell
 } from 'recharts';
 import { Wallet, TrendingUp, TrendingDown, Calendar, AlertCircle, ChevronRight, Activity } from 'lucide-react';
 

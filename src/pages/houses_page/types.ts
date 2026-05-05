@@ -8,6 +8,7 @@ export interface Occupant {
 export interface HouseOccupant {
   house_occupant_id: number;
   is_current: boolean;
+  is_head_family: boolean;
   start_in_date?: string;
   end_in_date?: string;
   occupant: Occupant;

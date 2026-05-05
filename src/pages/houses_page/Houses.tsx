@@ -39,7 +39,8 @@ export default function Houses() {
     occupant_id: '',
     start_in_date: new Date().toISOString().split('T')[0],
     end_in_date: '',
-    is_current: true
+    is_current: true,
+    is_head_family: false
   });
   const [formData, setFormData] = useState({
     house_name: '',
@@ -62,9 +63,16 @@ export default function Houses() {
   const fetchAllOccupants = useCallback(async () => {
     try {
       const res = await api.get('/occupants');
-      setAllOccupants(res.data.data ?? res.data);
+      const fetchedData = res.data.data ?? res.data;
+      if (Array.isArray(fetchedData)) {
+        setAllOccupants(fetchedData);
+      } else {
+        console.error('Occupants API returned non-array data:', fetchedData);
+        setAllOccupants([]);
+      }
     } catch (err) {
       console.error('Failed to fetch occupants:', err);
+      setAllOccupants([]);
     }
   }, []);
 
@@ -127,6 +135,13 @@ export default function Houses() {
     setCurrentHouse(null);
     setShowAddForm(false);
     setEditingHouseOccupantId(null);
+    setAddOccupantData({
+      occupant_id: '',
+      start_in_date: new Date().toISOString().split('T')[0],
+      end_in_date: '',
+      is_current: true,
+      is_head_family: false
+    });
   };
 
   const handlePrepEditOccupant = (ho: HouseOccupant) => {
@@ -134,7 +149,8 @@ export default function Houses() {
       occupant_id: String(ho.occupant.occupant_id),
       start_in_date: ho.start_in_date ? ho.start_in_date.split('T')[0] : '',
       end_in_date: ho.end_in_date ? ho.end_in_date.split('T')[0] : '',
-      is_current: ho.is_current
+      is_current: ho.is_current,
+      is_head_family: ho.is_head_family
     });
     setEditingHouseOccupantId(ho.house_occupant_id);
     setShowAddForm(true);
@@ -160,12 +176,13 @@ export default function Houses() {
       handleOpenDetail(currentHouse);
       setShowAddForm(false);
       setEditingHouseOccupantId(null);
-      setAddOccupantData({
-        occupant_id: '',
-        start_in_date: new Date().toISOString().split('T')[0],
-        end_in_date: '',
-        is_current: true
-      });
+        setAddOccupantData({
+          occupant_id: '',
+          start_in_date: new Date().toISOString().split('T')[0],
+          end_in_date: '',
+          is_current: true,
+          is_head_family: false
+        });
       fetchHouses();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Gagal menyimpan data penghuni.');
