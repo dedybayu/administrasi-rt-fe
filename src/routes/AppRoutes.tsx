@@ -10,6 +10,7 @@ import Dashboard from "../pages/dashboard_page/Dashboard";
 import Occupants from "../pages/occupants_page/Occupants";
 import Houses from "../pages/houses_page/Houses";
 import Payments from "../pages/payments_page/Payments";
+import Expenses from "../pages/expenses_page/Expenses";
 
 // Guard: redirect to /login if no token
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -37,6 +38,7 @@ function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/occupants" element={<Occupants />} />
         <Route path="/payments" element={<Payments />} />
+        <Route path="/expenses" element={<Expenses />} />
         <Route path="/houses" element={<Houses />} />
         <Route path="/info" element={<div className="p-8 text-center text-base-content/50">Halaman Informasi — segera hadir</div>} />
       </Route>

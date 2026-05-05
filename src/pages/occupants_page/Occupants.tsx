@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { User, Phone, IdCard, Heart, HeartOff, RefreshCw, Search, ChevronLeft, ChevronRight, Users, AlertCircle } from 'lucide-react';
+import { User, Phone, IdCard, Heart, HeartOff, RefreshCw, Search, ChevronLeft, ChevronRight, Users, AlertCircle, Plus, Pencil, Trash2, Camera, Eye } from 'lucide-react';
+import { OccupantModal } from './components/OccupantModal';
+import { DeleteConfirmationModal } from './components/DeleteConfirmationModal';
+import { OccupantDetailModal } from './components/OccupantDetailModal';
 
 interface Occupant {
   occupant_id: number;
@@ -10,6 +13,7 @@ interface Occupant {
   is_married: boolean;
   occupant_ktp_photo: string | null;
   occupant_ktp_url: string | null;
+  occupant_gender: 'L' | 'P' | null;
 }
 
 const ITEMS_PER_PAGE = 9;
@@ -35,6 +39,16 @@ export default function Occupants() {
   const [filterMarried, setFilterMarried] = useState<'all' | 'married' | 'single'>('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [page, setPage] = useState(1);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [editingOccupant, setEditingOccupant] = useState<Occupant | null>(null);
+  const [deletingOccupantId, setDeletingOccupantId] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+  
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedOccupantDetail, setSelectedOccupantDetail] = useState<Occupant | null>(null);
 
   const fetchOccupants = useCallback(async () => {
     setLoading(true);
@@ -48,6 +62,72 @@ export default function Occupants() {
       setLoading(false);
     }
   }, []);
+
+  const handleSubmit = async (formData: FormData) => {
+    setSubmitting(true);
+    setFormErrors({});
+    try {
+      if (editingOccupant) {
+        await api.post(`/occupants/${editingOccupant.occupant_id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        await api.post('/occupants', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+      setIsModalOpen(false);
+      setEditingOccupant(null);
+      setFormErrors({});
+      fetchOccupants();
+    } catch (err: any) {
+      if (err.response?.status === 400 && err.response?.data) {
+        setFormErrors(err.response.data.errors || err.response.data);
+      } else {
+        setError(err.response?.data?.message || 'Gagal menyimpan data warga.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    setDeletingOccupantId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingOccupantId) return;
+    setSubmitting(true);
+    try {
+      await api.delete(`/occupants/${deletingOccupantId}`);
+      setIsDeleteModalOpen(false);
+      setDeletingOccupantId(null);
+      fetchOccupants();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Gagal menghapus data warga.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEdit = (o: Occupant) => {
+    setEditingOccupant(o);
+    setIsModalOpen(true);
+  };
+
+  const handleShowDetail = async (id: number) => {
+    setLoading(true);
+    try {
+      const res = await api.get(`/occupants/${id}`);
+      setSelectedOccupantDetail(res.data.data);
+      setIsDetailModalOpen(true);
+    } catch (err: any) {
+      setError('Gagal memuat detail warga.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => { fetchOccupants(); }, [fetchOccupants]);
   useEffect(() => { setPage(1); }, [search, filterMarried, filterStatus]);
@@ -76,14 +156,24 @@ export default function Occupants() {
             {loading ? 'Memuat data...' : `${filtered.length} dari ${occupants.length} warga`}
           </p>
         </div>
-        <button
-          onClick={fetchOccupants}
-          className="btn btn-ghost btn-sm gap-2"
-          disabled={loading}
-        >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-          Refresh
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={fetchOccupants}
+            className="btn btn-ghost btn-sm gap-2 font-bold"
+            disabled={loading}
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+          <button
+            onClick={() => { setEditingOccupant(null); setFormErrors({}); setIsModalOpen(true); }}
+            className="btn btn-primary btn-sm gap-2 font-black shadow-lg shadow-primary/20"
+            disabled={loading}
+          >
+            <Plus size={18} />
+            Tambah Warga
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -175,12 +265,15 @@ export default function Occupants() {
             <div key={o.occupant_id} className="card bg-base-100 border border-base-300 shadow-sm hover:shadow-md transition-shadow">
               <div className="card-body p-5">
                 {/* Header */}
-                <div className="flex items-start gap-3 mb-3">
-                  <div className={`w-14 h-14 rounded-2xl ${getAvatarColor(o.occupant_id)} text-white text-lg font-bold flex items-center justify-center shrink-0 shadow-sm border border-white/10`}>
+                <div 
+                  className="flex items-start gap-3 mb-3 cursor-pointer group/header"
+                  onClick={() => handleShowDetail(o.occupant_id)}
+                >
+                  <div className={`w-14 h-14 rounded-2xl ${getAvatarColor(o.occupant_id)} text-white text-lg font-bold flex items-center justify-center shrink-0 shadow-sm border border-white/10 group-hover/header:scale-105 transition-transform`}>
                     {getInitials(o.occupant_name)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-bold truncate text-base" title={o.occupant_name}>{o.occupant_name}</p>
+                    <p className="font-bold truncate text-base group-hover/header:text-primary transition-colors" title={o.occupant_name}>{o.occupant_name}</p>
                     <span className={`badge badge-sm mt-1 font-semibold ${statusBadge(o.occupant_status)}`}>{o.occupant_status}</span>
                   </div>
                   <div className="shrink-0">
@@ -214,14 +307,62 @@ export default function Occupants() {
                   )}
                 </div>
 
-                <div className="card-actions justify-end mt-4">
+                <div className="card-actions justify-between items-center mt-6">
                   <span className="text-[10px] text-base-content/30 font-mono tracking-wider">ID-{String(o.occupant_id).padStart(4, '0')}</span>
+                  <div className="flex gap-1">
+                    <button 
+                      onClick={() => handleShowDetail(o.occupant_id)}
+                      className="btn btn-ghost btn-square btn-xs text-primary hover:bg-primary/10 transition-colors"
+                      title="Lihat Detail"
+                    >
+                      <Eye size={14} />
+                    </button>
+                    <button 
+                      onClick={() => { handleEdit(o); setFormErrors({}); }}
+                      className="btn btn-ghost btn-square btn-xs text-info hover:bg-info/10 transition-colors"
+                      title="Edit Warga"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(o.occupant_id)}
+                      className="btn btn-ghost btn-square btn-xs text-error hover:bg-error/10 transition-colors"
+                      title="Hapus Warga"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Modals */}
+      <OccupantModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        submitting={submitting}
+        editingOccupant={editingOccupant}
+        errors={formErrors}
+      />
+
+      <DeleteConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        submitting={submitting}
+        title="Hapus Data Warga"
+        message={`Apakah Anda yakin ingin menghapus data warga "${occupants.find(o => o.occupant_id === deletingOccupantId)?.occupant_name}"? Data yang sudah dihapus tidak dapat dikembalikan.`}
+      />
+
+      <OccupantDetailModal 
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        occupant={selectedOccupantDetail}
+      />
 
       {/* Pagination */}
       {!loading && totalPages > 1 && (

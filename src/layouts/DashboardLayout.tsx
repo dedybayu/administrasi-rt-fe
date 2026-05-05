@@ -11,7 +11,8 @@ import {
   Sun, 
   Moon,
   Monitor,
-  ChevronRight
+  ChevronRight,
+  TrendingDown
 } from 'lucide-react';
 import Cookies from 'js-cookie';
 
@@ -37,10 +38,16 @@ const navItems: NavItem[] = [
     icon: <Users size={20} />,
   },
   {
-    label: 'Iuran & Kas',
+    label: 'Iuran Warga',
     path: '/payments',
     rtOnly: true,
     icon: <Wallet size={20} />,
+  },
+  {
+    label: 'Pengeluaran',
+    path: '/expenses',
+    rtOnly: true,
+    icon: <TrendingDown size={20} />,
   },
   {
     label: 'Data Rumah',
