@@ -70,11 +70,13 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
       if (initialData) {
         setFormData({
-          dues_type_id: initialData.dues_type_id?.toString() || '',
-          house_occupant_id: initialData.house_occupant_id?.toString() || '',
-          payer_occupant_id: initialData.payer_occupant_id?.toString() || '',
+          dues_type_id: initialData.dues_type?.dues_type_id?.toString() || initialData.dues_type_id?.toString() || '',
+          house_occupant_id: initialData.house_occupant?.house_occupant_id?.toString() || initialData.house_occupant_id?.toString() || '',
+          payer_occupant_id: initialData.payer_occupant?.occupant_id?.toString() || initialData.payer_occupant_id?.toString() || '',
           payment_amount: initialData.payment_amount?.toString() || '',
-          payment_date: initialData.payment_date || new Date().toISOString().split('T')[0],
+          payment_date: initialData.payment_date 
+            ? new Date(initialData.payment_date).toISOString().split('T')[0] 
+            : new Date().toISOString().split('T')[0],
           payment_period_month: initialData.payment_period_month?.toString() || '',
           payment_period_year: initialData.payment_period_year?.toString() || '',
           payment_status: initialData.payment_status || '',

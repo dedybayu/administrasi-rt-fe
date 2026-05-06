@@ -15,14 +15,17 @@ import {
   History
 } from 'lucide-react';
 import { formatRupiah } from '../../utils/formatters';
+import { PayDuesModal } from './components/PayDuesModal';
 
 interface Payment {
   payment_id: number;
   dues_type: {
+    dues_type_id: number;
     dues_type_name: string;
     dues_type_amount: string;
   };
   house_occupant: {
+    house_occupant_id: number;
     house: {
       house_number: string;
       house_address: string;
@@ -50,6 +53,11 @@ export default function MyDues() {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'tagihan' | 'pending' | 'history'>('all');
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+
   const fetchDues = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -62,6 +70,32 @@ export default function MyDues() {
       setLoading(false);
     }
   }, []);
+
+  const handlePayClick = (p: Payment) => {
+    setSelectedPayment(p);
+    setFormErrors({});
+    setIsModalOpen(true);
+  };
+
+  const handlePaySubmit = async (formData: FormData) => {
+    setSubmitting(true);
+    setFormErrors({});
+    try {
+      await api.post('/warga/pay', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setIsModalOpen(false);
+      fetchDues();
+    } catch (err: any) {
+      if (err.response?.status === 400 && err.response?.data) {
+        setFormErrors(err.response.data.errors || err.response.data);
+      } else {
+        alert(err.response?.data?.message || 'Gagal mengirim bukti pembayaran.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     fetchDues();
@@ -143,7 +177,10 @@ export default function MyDues() {
               </p>
             </div>
             {status === 'tagihan' || status === 'rejected' ? (
-              <button className="btn btn-primary btn-sm rounded-xl font-bold gap-2 group-hover:px-6 transition-all">
+              <button 
+                onClick={() => handlePayClick(p)}
+                className="btn btn-primary btn-sm rounded-xl font-bold gap-2 group-hover:px-6 transition-all"
+              >
                 Bayar <ArrowRight size={14} />
               </button>
             ) : (
@@ -282,6 +319,16 @@ export default function MyDues() {
           </div>
         </div>
       )}
+
+      {/* Pay Modal */}
+      <PayDuesModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setSelectedPayment(null); }}
+        onSubmit={handlePaySubmit}
+        submitting={submitting}
+        payment={selectedPayment}
+        errors={formErrors}
+      />
     </div>
   );
 }

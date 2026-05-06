@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Home, History, CreditCard, Clock, AlertCircle, ChevronRight, CheckCircle2, Wallet } from 'lucide-react';
 import api from '../../../utils/api';
 import { formatRupiah } from '../../../utils/formatters';
+import { PayDuesModal } from '../../occupant_payments_page/components/PayDuesModal';
 
 interface House {
   house_id: number;
@@ -21,11 +22,13 @@ interface HouseOccupant {
 interface Payment {
   payment_id: number;
   dues_type: {
+    dues_type_id: number;
     dues_type_name: string;
     dues_type_amount: number;
   };
   house_occupant: {
     house: House;
+    house_occupant_id: number;
   };
   payment_amount: number;
   payment_date: string | null;
@@ -49,6 +52,11 @@ export const WargaDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
+
   const fetchDashboardData = useCallback(async () => {
     setLoading(true);
     try {
@@ -60,6 +68,32 @@ export const WargaDashboard: React.FC = () => {
       setLoading(false);
     }
   }, []);
+
+  const handlePayClick = (p: Payment) => {
+    setSelectedPayment(p);
+    setFormErrors({});
+    setIsModalOpen(true);
+  };
+
+  const handlePaySubmit = async (formData: FormData) => {
+    setSubmitting(true);
+    setFormErrors({});
+    try {
+      await api.post('/warga/pay', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setIsModalOpen(false);
+      fetchDashboardData();
+    } catch (err: any) {
+      if (err.response?.status === 400 && err.response?.data) {
+        setFormErrors(err.response.data.errors || err.response.data);
+      } else {
+        alert(err.response?.data?.message || 'Gagal mengirim bukti pembayaran.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -169,7 +203,12 @@ export const WargaDashboard: React.FC = () => {
                       </div>
                       <div className="text-right">
                         <p className="font-black text-error">{formatRupiah(p.payment_amount)}</p>
-                        <button className="btn btn-primary btn-xs rounded-lg mt-1 font-bold">Bayar Sekarang</button>
+                        <button 
+                          onClick={() => handlePayClick(p)}
+                          className="btn btn-primary btn-xs rounded-lg mt-1 font-bold"
+                        >
+                          Bayar Sekarang
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -274,6 +313,16 @@ export const WargaDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Pay Modal */}
+      <PayDuesModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setSelectedPayment(null); }}
+        onSubmit={handlePaySubmit}
+        submitting={submitting}
+        payment={selectedPayment as any}
+        errors={formErrors}
+      />
     </div>
   );
 };
