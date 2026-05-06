@@ -1,73 +1,112 @@
-# React + TypeScript + Vite
+# Administrasi RT - Frontend Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Antarmuka pengguna untuk sistem administrasi RT yang dibangun menggunakan React, TypeScript, dan Tailwind CSS.
 
-Currently, two official plugins are available:
+## Teknologi Utama
+- **Framework**: React 18
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS & DaisyUI
+- **Icons**: Lucide React
+- **State Management**: React Hooks & Context API
+- **HTTP Client**: Axios (dengan interceptor untuk Refresh Token)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Panduan Instalasi (Development)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Prasyarat
+- Node.js (versi 18 ke atas disarankan)
+- npm atau yarn
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 2. Kloning Repositori
+```bash
+git clone <url-repositori-ini>
+cd administrasi-rt-fe
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Instal Dependensi
+```bash
+npm install
 ```
+
+### 4. Konfigurasi Environment
+Buat file `.env` di root directory:
+```env
+VITE_API_URL=http://127.0.0.1:8000/api
+```
+*Pastikan backend Laravel sudah berjalan di URL tersebut.*
+
+### 5. Jalankan Aplikasi
+```bash
+npm run dev
+```
+Aplikasi akan berjalan di `http://localhost:5173`.
+
+---
+
+## Panduan Instalasi (Production)
+
+### 1. Prasyarat
+- Node.js (versi 18 ke atas disarankan)
+- npm atau yarn
+
+### 2. Kloning Repositori
+```bash
+git clone <url-repositori-ini>
+cd administrasi-rt-fe
+```
+
+### 3. Instal Dependensi
+```bash
+npm install
+```
+### 4. Build Project
+```bash
+npm run build
+```
+Hasil build akan berada di folder `/dist`.
+
+### 5. Deployment
+Isi dari folder `/dist` dapat di-host di berbagai platform static hosting seperti:
+- Vercel
+- Netlify
+- Firebase Hosting
+- Web Server (Nginx/Apache)
+- PM2 (Process Manager 2)
+
+Jika menggunakan Nginx, pastikan konfigurasi rute diarahkan ke `index.html` untuk mendukung Client Side Routing:
+```nginx
+location / {
+    try_files $uri $uri/ /index.html;
+}
+```
+
+#### Opsi Deployment dengan PM2
+Jika Anda ingin menjalankan aplikasi di server VPS menggunakan PM2:
+1. Pastikan `pm2` dan package `serve` sudah terinstal:
+   ```bash
+   npm install -g pm2 serve
+   ```
+2. Jalankan aplikasi menggunakan PM2:
+   ```bash
+   pm2 serve dist 5173 --spa --name "administrasi-rt-fe"
+   ```
+   *Ganti `5173` dengan port yang Anda inginkan.*
+
+---
+
+## Fitur Utama
+- Dashboard Statistik (RT & Warga)
+- Manajemen Data Warga (CRUD + Foto KTP)
+- Manajemen Data Rumah & Penghuni
+- Sistem Iuran & Pembayaran (Konfirmasi Pembayaran)
+- Catatan Pengeluaran Kas
+- Role-Based Access Control (RBAC)
+- Token Refresh Otomatis
+
+## Catatan
+Aplikasi ini bergantung sepenuhnya pada API dari repositori backend. Pastikan backend sudah terkonfigurasi dan berjalan dengan benar.
+
+<br>
+
+# Dokumentasi Hasil Tampilan
