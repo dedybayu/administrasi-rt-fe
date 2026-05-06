@@ -11,7 +11,7 @@ import Occupants from "../pages/occupants_page/Occupants";
 import Houses from "../pages/houses_page/Houses";
 import Payments from "../pages/payments_page/Payments";
 import Expenses from "../pages/expenses_page/Expenses";
-import MyDues from "../pages/warga_payments_page/MyDues";
+import MyDues from "../pages/occupant_payments_page/MyDues";
 
 // Guard: redirect to /login if no token
 function ProtectedRoute({ children }: { children: React.ReactNode }) {

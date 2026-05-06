@@ -293,13 +293,6 @@ export const DetailedReportModal: React.FC<DetailedReportModalProps> = ({
              >
                <Download size={16} /> Export PDF
              </button>
-             <button 
-               onClick={() => window.print()}
-               disabled={loading || !!error || !data}
-               className="btn btn-outline btn-sm rounded-xl gap-2 font-black border-base-300"
-             >
-               <Printer size={16} /> Cetak
-             </button>
           </div>
           <button onClick={onClose} className="btn btn-primary px-12 rounded-2xl font-black shadow-lg shadow-primary/20">
             Tutup Laporan
