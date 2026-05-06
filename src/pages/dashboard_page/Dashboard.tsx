@@ -13,8 +13,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  AreaChart,
-  Area,
 } from 'recharts';
 import { Wallet, TrendingUp, TrendingDown, Calendar, AlertCircle, ChevronRight, Activity, Shield, Eye, PieChart as PieChartIcon } from 'lucide-react';
 import { DetailedReportModal } from './components/DetailedReportModal';
@@ -218,7 +216,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <div className="h-[300px] w-full">
+              <div className="h-[450px] w-full">
                 {loading ? (
                   <div className="w-full h-full bg-base-200/50 animate-pulse rounded-2xl flex items-center justify-center">
                     <div className="loading loading-spinner loading-lg opacity-20"></div>
@@ -275,21 +273,20 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Daily Stats Chart */}
           <div className="card bg-base-100 shadow-xl border border-base-300 rounded-[2.5rem] overflow-hidden">
-            {/* Daily Stats Chart */}
-            <div className="card bg-base-100 shadow-xl border border-base-300 rounded-[2.5rem] overflow-hidden">
-              <div className="p-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                  <div>
-                    <h3 className="text-xl font-black flex items-center gap-2">
-                      <Activity className="text-secondary" size={24} />
-                      Statistik Harian - {new Date(2000, selectedMonth - 1).toLocaleString('id-ID', { month: 'long' })} {selectedYear}
-                    </h3>
-                    <p className="text-xs text-base-content/50 mt-1 font-medium italic">Rincian arus kas masuk dan keluar setiap tanggal</p>
-                  </div>
+            <div className="p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div>
+                  <h3 className="text-xl font-black flex items-center gap-2">
+                    <Activity className="text-secondary" size={24} />
+                    Statistik Harian - {new Date(2000, selectedMonth - 1).toLocaleString('id-ID', { month: 'long' })} {selectedYear}
+                  </h3>
+                  <p className="text-xs text-base-content/50 mt-1 font-medium italic">Rincian arus kas masuk dan keluar setiap tanggal</p>
                 </div>
+              </div>
 
-                <div className="h-[250px] w-full">
+              <div className="h-[400px] w-full">
                   {loadingDaily ? (
                     <div className="w-full h-full bg-base-200/50 animate-pulse rounded-2xl flex items-center justify-center">
                       <div className="loading loading-spinner loading-lg opacity-20"></div>
@@ -336,10 +333,11 @@ export default function Dashboard() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Secondary Info Cards & Monthly Analysis */}
-          <div className="flex flex-col gap-6">
+          {/* Secondary Info Cards & Monthly Analysis - RIGHT COLUMN */}
+        </div>
+
+        <div className="flex flex-col gap-6">
             {/* Monthly Analysis Chart */}
             <div className="card bg-base-100 shadow-xl border border-base-300 rounded-[2rem] p-6 flex-1">
               <div className="flex items-center justify-between mb-6">
@@ -526,16 +524,15 @@ export default function Dashboard() {
               Lihat Rincian Keuangan
               <ChevronRight className="ml-auto group-hover:translate-x-1 transition-transform" />
             </button>
-          </div>
         </div>
-
-        <DetailedReportModal
-          isOpen={isDetailModalOpen}
-          onClose={() => setIsDetailModalOpen(false)}
-          year={selectedYear}
-          month={selectedMonth}
-        />
       </div>
+
+      <DetailedReportModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        year={selectedYear}
+        month={selectedMonth}
+      />
     </div>
   );
 }
