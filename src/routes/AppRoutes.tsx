@@ -19,6 +19,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
+// Guard: RT Only
+function RtRoute({ children }: { children: React.ReactNode }) {
+  const isRt = Cookies.get("user_is_rt") === "true";
+  return isRt ? <>{children}</> : <Navigate to="/dashboard" replace />;
+}
+
+// Guard: Occupant Only
+function OccupantRoute({ children }: { children: React.ReactNode }) {
+  const isRt = Cookies.get("user_is_rt") === "true";
+  return !isRt ? <>{children}</> : <Navigate to="/dashboard" replace />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
@@ -36,13 +48,18 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
+        
+        {/* All Role */}
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/occupants" element={<Occupants />} />
-        <Route path="/payments" element={<Payments />} />
-        <Route path="/my-dues" element={<MyDues />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/houses" element={<Houses />} />
-        <Route path="/info" element={<div className="p-8 text-center text-base-content/50">Halaman Informasi — segera hadir</div>} />
+
+        {/* RT Only */}
+        <Route path="/occupants" element={<RtRoute><Occupants /></RtRoute>} />
+        <Route path="/payments" element={<RtRoute><Payments /></RtRoute>} />
+        <Route path="/expenses" element={<RtRoute><Expenses /></RtRoute>} />
+        <Route path="/houses" element={<RtRoute><Houses /></RtRoute>} />
+
+        {/* Occupant Only */}
+        <Route path="/my-dues" element={<OccupantRoute><MyDues /></OccupantRoute>} />
       </Route>
 
       {/* 404 fallback */}

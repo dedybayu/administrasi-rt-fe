@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Home, History, CreditCard, Clock, AlertCircle, ChevronRight, CheckCircle2, Wallet } from 'lucide-react';
 import api from '../../../utils/api';
 import { formatRupiah } from '../../../utils/formatters';
@@ -48,6 +49,7 @@ interface WargaDashboardData {
 }
 
 export const WargaDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [data, setData] = useState<WargaDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -188,7 +190,7 @@ export const WargaDashboard: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {data?.unpaid_payments.map((p) => (
+                  {data?.unpaid_payments.slice(0, 5).map((p) => (
                     <div key={p.payment_id} className="flex items-center justify-between p-5 bg-base-200/50 rounded-3xl border border-base-300 group hover:border-primary/30 transition-all">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary">
@@ -212,6 +214,14 @@ export const WargaDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
+                  {data?.unpaid_payments.length > 5 && (
+                    <button 
+                      onClick={() => navigate('/my-dues')}
+                      className="btn btn-ghost btn-block btn-sm rounded-xl mt-4 font-bold text-primary gap-2"
+                    >
+                      Lihat Semua <ChevronRight size={14} />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -262,7 +272,7 @@ export const WargaDashboard: React.FC = () => {
                 {data?.payment_history.length === 0 ? (
                   <p className="text-center py-8 text-xs font-bold text-base-content/30 italic">Belum ada riwayat</p>
                 ) : (
-                  data?.payment_history.map((p) => (
+                  data?.payment_history.slice(0, 5).map((p) => (
                     <div key={p.payment_id} className="flex items-center justify-between gap-3 p-3 hover:bg-base-200 rounded-2xl transition-colors cursor-pointer group">
                       <div className="w-10 h-10 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
                         <CheckCircle2 size={18} />
@@ -281,9 +291,14 @@ export const WargaDashboard: React.FC = () => {
                 )}
               </div>
               
-              <button className="btn btn-ghost btn-block btn-sm rounded-xl mt-4 font-bold text-primary gap-2">
-                Lihat Semua <ChevronRight size={14} />
-              </button>
+              {data?.payment_history && data.payment_history.length > 5 && (
+                <button 
+                  onClick={() => navigate('/my-dues')}
+                  className="btn btn-ghost btn-block btn-sm rounded-xl mt-4 font-bold text-primary gap-2"
+                >
+                  Lihat Semua <ChevronRight size={14} />
+                </button>
+              )}
             </div>
           </div>
 

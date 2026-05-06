@@ -12,7 +12,8 @@ import {
   Info,
   CreditCard,
   ArrowRight,
-  History
+  History,
+  ChevronLeft
 } from 'lucide-react';
 import { formatRupiah } from '../../utils/formatters';
 import { PayDuesModal } from './components/PayDuesModal';
@@ -52,6 +53,8 @@ export default function MyDues() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'tagihan' | 'pending' | 'history'>('all');
+  const [page, setPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
@@ -100,6 +103,52 @@ export default function MyDues() {
   useEffect(() => {
     fetchDues();
   }, [fetchDues]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab]);
+
+  const getActiveList = () => {
+    if (!data) return [];
+    let list: { p: Payment, status: string }[] = [];
+    
+    const tagihan = data.tagihan.map(p => ({ p, status: 'tagihan' }));
+    const rejected = data.rejected.map(p => ({ p, status: 'rejected' }));
+    const pending = data.pending.map(p => ({ p, status: 'pending' }));
+    const success = data.success.map(p => ({ p, status: 'success' }));
+
+    switch (activeTab) {
+      case 'tagihan':
+        list = [...rejected, ...tagihan];
+        break;
+      case 'pending':
+        list = pending;
+        break;
+      case 'history':
+        list = success;
+        break;
+      case 'all':
+      default:
+        list = [...rejected, ...tagihan, ...pending, ...success].sort((a, b) => 
+          b.p.payment_period_year - a.p.payment_period_year || 
+          b.p.payment_period_month - a.p.payment_period_month
+        );
+    }
+    return list;
+  };
+
+  const activeList = getActiveList();
+  const totalPages = Math.ceil(activeList.length / ITEMS_PER_PAGE);
+  const paginatedList = activeList.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+  const getEmptyMessage = () => {
+    switch (activeTab) {
+      case 'tagihan': return { icon: <CheckCircle2 size={48} />, text: 'Tidak ada tagihan aktif', color: 'text-success' };
+      case 'pending': return { icon: <Clock size={48} />, text: 'Tidak ada iuran dalam proses', color: 'text-warning' };
+      case 'history': return { icon: <History size={48} />, text: 'Belum ada riwayat iuran', color: 'text-primary' };
+      default: return { icon: <AlertCircle size={48} />, text: 'Tidak ada data ditemukan', color: 'text-base-content' };
+    }
+  };
 
   const months = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -261,44 +310,49 @@ export default function MyDues() {
           </div>
         ) : (
           <>
-            {/* Tagihan & Rejected (Shown in All or Tagihan tab) */}
-            {(activeTab === 'all' || activeTab === 'tagihan') && (
+            {paginatedList.length === 0 ? (
+              <div className="text-center py-20 bg-base-200/30 rounded-[2.5rem] border-2 border-dashed border-base-300">
+                <div className={`${getEmptyMessage().color} opacity-20 mb-4 flex justify-center`}>
+                  {getEmptyMessage().icon}
+                </div>
+                <p className="font-black text-base-content/40 uppercase tracking-widest text-sm">{getEmptyMessage().text}</p>
+              </div>
+            ) : (
               <div className="space-y-4">
-                {(data?.tagihan.length === 0 && data?.rejected.length === 0 && activeTab === 'tagihan') && (
-                   <div className="text-center py-20 bg-base-200/30 rounded-[2.5rem] border-2 border-dashed border-base-300">
-                    <CheckCircle2 size={48} className="mx-auto text-success opacity-20 mb-4" />
-                    <p className="font-black text-base-content/40 uppercase tracking-widest text-sm">Tidak ada tagihan aktif</p>
-                  </div>
-                )}
-                
-                {data?.rejected.map(p => <PaymentCard key={p.payment_id} p={p} status="rejected" />)}
-                {data?.tagihan.map(p => <PaymentCard key={p.payment_id} p={p} status="tagihan" />)}
+                {paginatedList.map(({ p, status }) => (
+                  <PaymentCard key={p.payment_id} p={p} status={status} />
+                ))}
               </div>
             )}
 
-            {/* Pending (Shown in All or Pending tab) */}
-            {(activeTab === 'all' || activeTab === 'pending') && (
-              <div className="space-y-4">
-                {activeTab === 'pending' && data?.pending.length === 0 && (
-                  <div className="text-center py-20 bg-base-200/30 rounded-[2.5rem] border-2 border-dashed border-base-300">
-                    <Clock size={48} className="mx-auto text-warning opacity-20 mb-4" />
-                    <p className="font-black text-base-content/40 uppercase tracking-widest text-sm">Tidak ada iuran dalam proses</p>
-                  </div>
-                )}
-                {data?.pending.map(p => <PaymentCard key={p.payment_id} p={p} status="pending" />)}
-              </div>
-            )}
-
-            {/* Success (Shown in All or History tab) */}
-            {(activeTab === 'all' || activeTab === 'history') && (
-              <div className="space-y-4">
-                {activeTab === 'history' && data?.success.length === 0 && (
-                  <div className="text-center py-20 bg-base-200/30 rounded-[2.5rem] border-2 border-dashed border-base-300">
-                    <History size={48} className="mx-auto text-primary opacity-20 mb-4" />
-                    <p className="font-black text-base-content/40 uppercase tracking-widest text-sm">Belum ada riwayat iuran</p>
-                  </div>
-                )}
-                {data?.success.map(p => <PaymentCard key={p.payment_id} p={p} status="success" />)}
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-3 mt-8">
+                <button 
+                  className="btn btn-sm btn-outline btn-square rounded-xl" 
+                  onClick={() => setPage((p) => Math.max(1, p - 1))} 
+                  disabled={page === 1}
+                >
+                  <ChevronLeft size={18} />
+                </button>
+                <div className="join">
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                      key={i}
+                      className={`join-item btn btn-sm ${page === i + 1 ? 'btn-primary' : 'btn-ghost'} font-bold`}
+                      onClick={() => setPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  className="btn btn-sm btn-outline btn-square rounded-xl" 
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))} 
+                  disabled={page === totalPages}
+                >
+                  <ChevronRight size={18} />
+                </button>
               </div>
             )}
           </>

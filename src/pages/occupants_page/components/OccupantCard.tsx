@@ -1,4 +1,4 @@
-import { Phone, User, IdCard, Heart, HeartOff, RefreshCw, Eye, Pencil, Trash2 } from 'lucide-react';
+import { Phone, User, IdCard, RefreshCw, Eye, Pencil, Trash2 } from 'lucide-react';
 import type{ Occupant } from '../hooks/useOccupants';
 
 interface OccupantCardProps {

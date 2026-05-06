@@ -26,6 +26,7 @@ interface NavItem {
   path: string;
   icon: React.ReactNode;
   rtOnly?: boolean;
+  occupantOnly?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -50,6 +51,7 @@ const navItems: NavItem[] = [
     label: 'Iuran Saya',
     path: '/my-dues',
     icon: <CreditCard size={20} />,
+    occupantOnly: true,
   },
   {
     label: 'Pengeluaran',
@@ -117,7 +119,11 @@ export default function DashboardLayout() {
     navigate('/login');
   };
 
-  const visibleNavItems = navItems.filter((item) => !item.rtOnly || isRt);
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.rtOnly && !isRt) return false;
+    if (item.occupantOnly && isRt) return false;
+    return true;
+  });
 
   const ThemeButton = ({ className = "" }: { className?: string }) => {
     const icons = {
