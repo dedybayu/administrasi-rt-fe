@@ -83,7 +83,18 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           payment_duration: '1',
         });
         setOperationType(initialData.payment_status ? 'pay' : 'bill');
-        setPreviewUrl(initialData.payment_proof_url || null);
+        
+        // Fetch image as blob if it exists
+        if (initialData.payment_proof) {
+          api.get(`/payment-proof/${initialData.payment_proof}`, { responseType: 'blob' })
+            .then(res => {
+              const url = URL.createObjectURL(res.data);
+              setPreviewUrl(url);
+            })
+            .catch(() => setPreviewUrl(null));
+        } else {
+          setPreviewUrl(null);
+        }
       } else {
         setOperationType('pay');
         setFormData({
@@ -103,6 +114,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       setSearchTerm('');
       setIsDropdownOpen(false);
     }
+
+    return () => {
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
   }, [isOpen, initialData]);
 
   useEffect(() => {
