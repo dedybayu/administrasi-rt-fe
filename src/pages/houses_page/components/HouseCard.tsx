@@ -45,7 +45,11 @@ export const HouseCard: React.FC<HouseCardProps> = ({
         <div className="pt-4 border-t border-base-200 flex items-center justify-between">
           <div className="flex items-center gap-2 text-base-content/60">
             <Users size={16} className="text-secondary" />
-            <span className="text-sm font-bold">{house.house_occupants_count || 0} Penghuni</span>
+            <span className="text-sm font-bold">
+              {house.house_occupants_count && house.house_occupants_count > 0 
+                ? `${house.house_occupants_count} Penghuni` 
+                : 'Tidak Dihuni'}
+            </span>
           </div>
           <div className="flex gap-1">
             <button 

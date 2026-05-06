@@ -93,7 +93,7 @@ export const OccupantDetailModal: React.FC<OccupantDetailModalProps> = ({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box max-w-3xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
+      <div className="modal-box max-w-4xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
         <div className="p-6 bg-primary text-primary-content flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">

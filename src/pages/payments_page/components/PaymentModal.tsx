@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Save, Loader2, Wallet, Calendar, Building2, Upload, Image as ImageIcon, AlertCircle, Receipt } from 'lucide-react';
+import { X, Save, Loader2, Wallet, Calendar, Building2, Upload, Image as ImageIcon, AlertCircle, Receipt, Search, ChevronDown, Clock } from 'lucide-react';
 import api from '../../../utils/api';
 
 interface DuesType {
@@ -19,12 +19,13 @@ interface HouseOccupant {
   occupant: {
     occupant_name: string;
   };
+  is_head_family: boolean;
 }
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: FormData) => void;
+  onSubmit: (formData: FormData | FormData[]) => void;
   submitting: boolean;
   errors: Record<string, string[]>;
 }
@@ -45,6 +46,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     payment_period_month: (new Date().getMonth() + 1).toString(),
     payment_period_year: new Date().getFullYear().toString(),
     payment_status: 'success' as string | null,
+    payment_duration: '1',
   });
 
   const [operationType, setOperationType] = useState<'pay' | 'bill'>('pay');
@@ -53,7 +55,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const [houseOccupants, setHouseOccupants] = useState<HouseOccupant[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -71,11 +76,61 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         payment_period_month: (new Date().getMonth() + 1).toString(),
         payment_period_year: new Date().getFullYear().toString(),
         payment_status: 'success',
+        payment_duration: '1',
       });
       setSelectedFile(null);
       setPreviewUrl(null);
+      setSearchTerm('');
+      setIsDropdownOpen(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredAndSortedOccupants = houseOccupants
+    .filter(ho => ho.is_head_family)
+    .filter(ho => {
+      const searchStr = `${ho.house.house_name} ${ho.house.house_number} ${ho.occupant.occupant_name}`.toLowerCase();
+      return searchStr.includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      const nameA = `${a.house.house_name} ${a.house.house_number}`.toLowerCase();
+      const nameB = `${b.house.house_name} ${b.house.house_number}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+
+  const selectedOccupant = houseOccupants.find(ho => ho.house_occupant_id === parseInt(formData.house_occupant_id));
+
+  const getDurationSummary = () => {
+    const duration = parseInt(formData.payment_duration) || 1;
+    if (duration <= 1) return null;
+
+    const startMonth = parseInt(formData.payment_period_month);
+    const startYear = parseInt(formData.payment_period_year);
+
+    if (!startMonth || !startYear) return null;
+
+    let endMonth = startMonth + duration - 1;
+    let endYear = startYear;
+
+    while (endMonth > 12) {
+      endMonth -= 12;
+      endYear += 1;
+    }
+
+    const startLabel = new Date(startYear, startMonth - 1).toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+    const endLabel = new Date(endYear, endMonth - 1).toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+
+    return `${startLabel} s/d ${endLabel}`;
+  };
 
   const handleOperationTypeChange = (type: 'pay' | 'bill') => {
     setOperationType(type);
@@ -118,21 +173,50 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === 'payment_status' && operationType === 'bill') {
-        // Skip status to let it be NULL on backend
-      } else if (key === 'payment_date' && operationType === 'bill') {
-        // Skip date to let it be NULL on backend
-      } else if (value !== null && value !== undefined) {
-        data.append(key, value.toString());
-      }
-    });
+    
+    const duration = parseInt(formData.payment_duration) || 1;
+    const formDataArray: FormData[] = [];
 
-    if (operationType === 'pay' && selectedFile) {
-      data.append('payment_proof', selectedFile);
+    for (let i = 0; i < duration; i++) {
+      const data = new FormData();
+      
+      // Calculate month and year for this iteration
+      let month = parseInt(formData.payment_period_month) + i;
+      let year = parseInt(formData.payment_period_year);
+      
+      while (month > 12) {
+        month -= 12;
+        year += 1;
+      }
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'payment_status' && operationType === 'bill') {
+          // Skip status to let it be NULL on backend
+        } else if (key === 'payment_date' && operationType === 'bill') {
+          // Skip date to let it be NULL on backend
+        } else if (key === 'payment_period_month') {
+          data.append(key, month.toString());
+        } else if (key === 'payment_period_year') {
+          data.append(key, year.toString());
+        } else if (key === 'payment_duration') {
+          // Skip duration field for API
+        } else if (value !== null && value !== undefined) {
+          data.append(key, value.toString());
+        }
+      });
+
+      if (operationType === 'pay' && selectedFile) {
+        data.append('payment_proof', selectedFile);
+      }
+      
+      formDataArray.push(data);
     }
-    onSubmit(data);
+
+    if (formDataArray.length === 1) {
+      onSubmit(formDataArray[0]);
+    } else {
+      onSubmit(formDataArray);
+    }
   };
 
   const ErrorMessage = ({ name }: { name: string }) => {
@@ -150,7 +234,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box max-w-4xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
+      <div className="modal-box max-w-5xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
         <div className="p-6 bg-primary text-primary-content">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -186,21 +270,59 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               <label className="label">
                 <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Warga & Rumah</span>
               </label>
-              <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
-                <select
-                  className="select select-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
-                  value={formData.house_occupant_id}
-                  onChange={(e) => handleHouseOccupantChange(e.target.value)}
-                  required
+              <div className="relative" ref={dropdownRef}>
+                <div 
+                  className="relative cursor-pointer"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
-                  <option value="">Pilih Rumah/Warga</option>
-                  {houseOccupants.map(ho => (
-                    <option key={ho.house_occupant_id} value={ho.house_occupant_id}>
-                      {ho.house.house_name} {ho.house.house_number} - {ho.occupant.occupant_name}
-                    </option>
-                  ))}
-                </select>
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30 z-10" size={18} />
+                  <div className={`input input-bordered w-full pl-10 pr-10 flex items-center font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all ${!formData.house_occupant_id ? 'text-base-content/40' : ''}`}>
+                    {selectedOccupant 
+                      ? `${selectedOccupant.house.house_name} ${selectedOccupant.house.house_number} - ${selectedOccupant.occupant.occupant_name}`
+                      : 'Pilih Rumah/Warga'}
+                  </div>
+                  <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-base-content/30 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} size={18} />
+                </div>
+
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-base-100 border border-base-300 rounded-2xl shadow-2xl z-[100] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="p-3 border-b border-base-200">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={14} />
+                        <input
+                          type="text"
+                          placeholder="Cari rumah atau nama..."
+                          className="input input-sm input-bordered w-full pl-9 bg-base-200/50 border-none focus:bg-base-200"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-60 overflow-y-auto p-2">
+                      {filteredAndSortedOccupants.length > 0 ? (
+                        filteredAndSortedOccupants.map(ho => (
+                          <div
+                            key={ho.house_occupant_id}
+                            className={`p-3 rounded-xl cursor-pointer hover:bg-primary/10 hover:text-primary transition-colors text-sm font-bold flex items-center gap-3 ${formData.house_occupant_id === ho.house_occupant_id.toString() ? 'bg-primary/20 text-primary' : ''}`}
+                            onClick={() => {
+                              handleHouseOccupantChange(ho.house_occupant_id.toString());
+                              setIsDropdownOpen(false);
+                              setSearchTerm('');
+                            }}
+                          >
+                            <Building2 size={14} className="opacity-50" />
+                            <span>{ho.house.house_name} {ho.house.house_number} - {ho.occupant.occupant_name}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-8 text-center">
+                          <p className="text-xs font-bold text-base-content/40 uppercase tracking-widest">Tidak ada hasil</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               <ErrorMessage name="house_occupant_id" />
             </div>
@@ -274,26 +396,65 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Tanggal Bayar</span>
+                <span className={`label-text font-black text-xs uppercase tracking-wider ${operationType === 'pay' ? 'text-primary' : 'text-base-content/50'}`}>
+                  {operationType === 'pay' ? 'Bayar Sekaligus' : 'Tagih Sekaligus'} (Durasi Bulan)
+                </span>
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                <Clock className={`absolute left-3 top-1/2 -translate-y-1/2 ${operationType === 'pay' ? 'text-primary/30' : 'text-base-content/30'}`} size={18} />
                 <input
-                  type="date"
-                  className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
-                  value={formData.payment_date}
-                  onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
-                  required
+                  type="number"
+                  min="1"
+                  max="12"
+                  className={`input input-bordered w-full pl-10 font-bold transition-all ${operationType === 'pay' ? 'bg-primary/5 border-primary/20 focus:bg-primary/10 text-primary' : 'bg-base-200/50 border-none focus:bg-base-100'}`}
+                  placeholder="Contoh: 3 (untuk 3 bulan sekaligus)"
+                  value={formData.payment_duration}
+                  onChange={(e) => setFormData({ ...formData, payment_duration: e.target.value })}
                 />
               </div>
+              {getDurationSummary() && (
+                <div className={`mt-2 p-3 rounded-xl border flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${operationType === 'pay' ? 'bg-primary/10 border-primary/20' : 'bg-base-200/50 border-base-300'}`}>
+                  <Calendar size={14} className={operationType === 'pay' ? 'text-primary' : 'text-base-content/40'} />
+                  <p className={`text-[11px] font-black uppercase tracking-wider ${operationType === 'pay' ? 'text-primary' : 'text-base-content/60'}`}>
+                    {getDurationSummary()}
+                  </p>
+                </div>
+              )}
+              <p className={`text-[10px] font-bold mt-1.5 uppercase tracking-tight ml-1 ${operationType === 'pay' ? 'text-primary/50' : 'text-base-content/40'}`}>
+                {operationType === 'pay' 
+                  ? 'Bukti pembayaran akan diduplikasi otomatis untuk setiap bulan.'
+                  : 'Tagihan akan dibuat terpisah untuk setiap bulan.'}
+              </p>
             </div>
+
+            {operationType === 'pay' && (
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Tanggal Bayar</span>
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                  <input
+                    type="date"
+                    className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
+                    value={formData.payment_date}
+                    onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-5 flex flex-col h-full">
             <div className="form-control flex-1 flex flex-col">
               <label className="label">
                 <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">
-                  {operationType === 'pay' ? 'Bukti Pembayaran' : 'Catatan Penagihan'}
+                  {operationType === 'pay' ? (
+                    <>
+                      Bukti Pembayaran <span className="text-error ml-1">* (Wajib)</span>
+                    </>
+                  ) : 'Catatan Penagihan'}
                 </span>
               </label>
 

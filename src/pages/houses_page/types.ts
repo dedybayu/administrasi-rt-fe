@@ -5,6 +5,22 @@ export interface Occupant {
   occupant_phone_number?: string;
 }
 
+export interface Payment {
+  payment_id: number;
+  dues_type_id: number;
+  payment_amount: string;
+  payment_date: string;
+  payment_period_month: number;
+  payment_period_year: number;
+  payment_status: string;
+  dues_type?: {
+    dues_type_name: string;
+  };
+  payer_occupant?: {
+    occupant_name: string;
+  };
+}
+
 export interface HouseOccupant {
   house_occupant_id: number;
   is_current: boolean;
@@ -12,6 +28,7 @@ export interface HouseOccupant {
   start_in_date?: string;
   end_in_date?: string;
   occupant: Occupant;
+  payments?: Payment[];
 }
 
 export interface House {

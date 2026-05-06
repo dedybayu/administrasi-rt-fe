@@ -12,6 +12,7 @@ interface Occupant {
   occupant_ktp_photo: string | null;
   occupant_ktp_url: string | null;
   occupant_gender: 'L' | 'P' | null;
+  users?: { username: string }[];
 }
 
 interface OccupantModalProps {
@@ -37,6 +38,8 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
     occupant_phone_number: '',
     is_married: false,
     occupant_gender: null as 'L' | 'P' | null,
+    username: '',
+    password: '',
   });
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -52,6 +55,8 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
         occupant_phone_number: editingOccupant.occupant_phone_number,
         is_married: editingOccupant.is_married,
         occupant_gender: editingOccupant.occupant_gender,
+        username: editingOccupant.users?.[0]?.username || '',
+        password: '',
       });
       
       if (editingOccupant.occupant_ktp_photo) {
@@ -73,6 +78,8 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
         occupant_phone_number: '',
         is_married: false,
         occupant_gender: null,
+        username: '',
+        password: '',
       });
       setPreviewUrl(null);
     }
@@ -108,6 +115,11 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
       data.append('occupant_gender', formData.occupant_gender);
     }
     
+    data.append('username', formData.username);
+    if (formData.password) {
+      data.append('password', formData.password);
+    }
+    
     if (selectedFile) {
       data.append('occupant_ktp_photo', selectedFile);
     }
@@ -134,8 +146,8 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box max-w-2xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200">
-        <div className="p-6 bg-primary text-primary-content flex items-center justify-between">
+      <div className="modal-box max-w-4xl p-0 overflow-hidden bg-base-100 border border-base-300 shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+        <div className="p-6 bg-primary text-primary-content flex items-center justify-between shrink-0">
           <div>
             <h3 className="font-black text-xl">{editingOccupant ? 'Edit Data Warga' : 'Tambah Warga Baru'}</h3>
             <p className="text-xs opacity-70 font-bold uppercase tracking-widest mt-1">Formulir Identitas Warga</p>
@@ -145,8 +157,9 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+          <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
+          <div className="grid grid-cols-1 gap-6">
             <div className="space-y-4">
               <div className="form-control">
                 <label className="label">
@@ -244,10 +257,45 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
                     <span className="label-text font-bold text-sm">Sudah Menikah</span>
                   </div>
                 </label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Username</span>
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                    <input 
+                      type="text" 
+                      placeholder="Username warga" 
+                      className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
+                      value={formData.username}
+                      onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <ErrorMessage name="username" />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">
+                      {editingOccupant ? 'Ganti Password' : 'Password'}
+                    </span>
+                  </label>
+                  <div className="relative">
+                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                    <input 
+                      type="password" 
+                      placeholder={editingOccupant ? 'Kosongkan jika tidak ganti' : 'Password baru'} 
+                      className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required={!editingOccupant}
+                    />
+                  </div>
+                  <ErrorMessage name="password" />
+                </div>
               </div>
-            </div>
 
-            <div className="space-y-4">
               <label className="label">
                 <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Foto KTP</span>
               </label>
@@ -289,7 +337,8 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
             </div>
           </div>
 
-          <div className="modal-action mt-8 pt-6 border-t border-base-200">
+          </div>
+          <div className="modal-action p-6 mt-0 border-t border-base-200 shrink-0">
             <button 
               type="button" 
               onClick={onClose} 
@@ -313,6 +362,7 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
               )}
             </button>
           </div>
+</div>
         </form>
       </div>
       <div className="modal-backdrop bg-black/40 backdrop-blur-sm" onClick={onClose}></div>

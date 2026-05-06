@@ -14,6 +14,7 @@ interface Occupant {
   occupant_ktp_photo: string | null;
   occupant_ktp_url: string | null;
   occupant_gender: 'L' | 'P' | null;
+  users?: { username: string }[];
 }
 
 const ITEMS_PER_PAGE = 9;

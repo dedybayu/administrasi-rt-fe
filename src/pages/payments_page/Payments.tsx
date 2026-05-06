@@ -89,13 +89,22 @@ export default function Payments() {
     }
   }, []);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (formData: FormData | FormData[]) => {
     setSubmitting(true);
     setFormErrors({});
     try {
-      await api.post('/payments', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (Array.isArray(formData)) {
+        // Sequential requests for multi-month payment
+        for (const data of formData) {
+          await api.post('/payments', data, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        }
+      } else {
+        await api.post('/payments', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
       setIsModalOpen(false);
       fetchPayments();
     } catch (err: any) {

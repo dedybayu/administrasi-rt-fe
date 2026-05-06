@@ -216,66 +216,133 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
               <p className="text-xs font-bold text-base-content/40 uppercase tracking-widest">Memuat Data...</p>
             </div>
           ) : (
-            <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-              {currentHouse?.house_occupants && currentHouse.house_occupants.length > 0 ? (
-                currentHouse.house_occupants.map((ho) => (
-                  <div key={ho.house_occupant_id} className="p-4 rounded-2xl bg-base-200/50 border border-base-300 flex items-center justify-between group hover:bg-base-200 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${ho.is_current ? 'bg-success/10 text-success' : 'bg-base-content/10 text-base-content/50'}`}>
-                        {ho.is_current ? <UserCheck size={20} /> : <History size={20} />}
-                      </div>
-                      <div>
-                        <p className="font-black text-base-content leading-tight">{ho.occupant.occupant_name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`badge badge-xs font-bold uppercase ${ho.is_current ? 'badge-success' : 'badge-ghost opacity-50'}`}>
-                            {ho.is_current ? 'Aktif' : 'Riwayat'}
-                          </span>
-                          {!!ho.is_head_family && (
-                            <span className="badge badge-xs badge-primary font-bold uppercase">Kepala Keluarga</span>
-                          )}
-                          <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-wider">{ho.occupant.occupant_status}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-1 opacity-50">
-                          <Calendar size={10} />
-                          <span className="text-[9px] font-bold uppercase tracking-tight">
-                            {ho.start_in_date ? new Date(ho.start_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} — {ho.is_current ? 'Sekarang' : (ho.end_in_date ? new Date(ho.end_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-1">
-                      {ho.occupant.occupant_phone_number && (
-                        <a 
-                          href={`tel:${ho.occupant.occupant_phone_number}`}
-                          className="btn btn-circle btn-ghost btn-sm text-primary"
-                          title="Hubungi"
-                        >
-                          <Phone size={16} />
-                        </a>
-                      )}
-                      <button 
-                        onClick={() => onEditOccupant(ho)}
-                        className="btn btn-circle btn-ghost btn-sm text-info opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Edit"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button 
-                        onClick={() => onDeleteOccupant(ho.house_occupant_id)}
-                        className="btn btn-circle btn-ghost btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
-                        title="Hapus"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center bg-base-200/30 rounded-3xl border border-dashed border-base-300">
-                  <Users size={32} className="text-base-content/10 mb-2" />
-                  <p className="text-xs font-bold text-base-content/30 uppercase tracking-widest">Belum Ada Penghuni</p>
+            <div className="space-y-6">
+              {/* Penghuni Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">Daftar Penghuni</h4>
                 </div>
-              )}
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {currentHouse?.house_occupants && currentHouse.house_occupants.length > 0 ? (
+                    currentHouse.house_occupants.map((ho) => (
+                      <div key={ho.house_occupant_id} className="p-4 rounded-2xl bg-base-200/50 border border-base-300 flex items-center justify-between group hover:bg-base-200 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${ho.is_current ? 'bg-success/10 text-success' : 'bg-base-content/10 text-base-content/50'}`}>
+                            {ho.is_current ? <UserCheck size={20} /> : <History size={20} />}
+                          </div>
+                          <div>
+                            <p className="font-black text-base-content leading-tight">{ho.occupant.occupant_name}</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`badge badge-xs font-bold uppercase ${ho.is_current ? 'badge-success' : 'badge-ghost opacity-50'}`}>
+                                {ho.is_current ? 'Aktif' : 'Riwayat'}
+                              </span>
+                              {!!ho.is_head_family && (
+                                <span className="badge badge-xs badge-primary font-bold uppercase">Kepala Keluarga</span>
+                              )}
+                              <span className="text-[10px] font-bold text-base-content/40 uppercase tracking-wider">{ho.occupant.occupant_status}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 opacity-50">
+                              <Calendar size={10} />
+                              <span className="text-[9px] font-bold uppercase tracking-tight">
+                                {ho.start_in_date ? new Date(ho.start_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} — {ho.is_current ? 'Sekarang' : (ho.end_in_date ? new Date(ho.end_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-')}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-1">
+                          {ho.occupant.occupant_phone_number && (
+                            <a 
+                              href={`tel:${ho.occupant.occupant_phone_number}`}
+                              className="btn btn-circle btn-ghost btn-sm text-primary"
+                              title="Hubungi"
+                            >
+                              <Phone size={16} />
+                            </a>
+                          )}
+                          <button 
+                            onClick={() => onEditOccupant(ho)}
+                            className="btn btn-circle btn-ghost btn-sm text-info opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Edit"
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button 
+                            onClick={() => onDeleteOccupant(ho.house_occupant_id)}
+                            className="btn btn-circle btn-ghost btn-sm text-error opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Hapus"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center bg-base-200/30 rounded-3xl border border-dashed border-base-300">
+                      <Users size={32} className="text-base-content/10 mb-2" />
+                      <p className="text-xs font-bold text-base-content/30 uppercase tracking-widest">Belum Ada Penghuni</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Pembayaran Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-base-content/40">Riwayat Pembayaran</h4>
+                </div>
+                <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {(currentHouse?.house_occupants?.flatMap(ho => 
+                    (ho.payments || []).map(p => ({
+                      ...p,
+                      occupant_name: ho.occupant.occupant_name
+                    }))
+                  ).sort((a, b) => {
+                    if (b.payment_period_year !== a.payment_period_year) {
+                      return b.payment_period_year - a.payment_period_year;
+                    }
+                    return b.payment_period_month - a.payment_period_month;
+                  }) || []).length > 0 ? (
+                    (currentHouse?.house_occupants?.flatMap(ho => 
+                      (ho.payments || []).map(p => ({
+                        ...p,
+                        occupant_name: ho.occupant.occupant_name
+                      }))
+                    ).sort((a, b) => {
+                      if (b.payment_period_year !== a.payment_period_year) {
+                        return b.payment_period_year - a.payment_period_year;
+                      }
+                      return b.payment_period_month - a.payment_period_month;
+                    }) || []).map((payment) => (
+                      <div key={payment.payment_id} className="p-3 rounded-xl bg-base-100 border border-base-200 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${payment.payment_status === 'success' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                            <History size={14} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-xs">
+                              {payment.dues_type?.dues_type_name || 'Iuran'} - {new Date(payment.payment_period_year, payment.payment_period_month - 1).toLocaleString('id-ID', { month: 'long', year: 'numeric' })}
+                            </p>
+                            <p className="text-[10px] font-bold text-base-content/40 uppercase tracking-tight">
+                              Oleh: {payment.occupant_name}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-black text-xs text-primary">Rp {parseInt(payment.payment_amount).toLocaleString('id-ID')}</p>
+                          <span className={`badge badge-xs font-bold uppercase ${payment.payment_status === 'success' ? 'badge-success' : 'badge-warning'}`}>
+                            {payment.payment_status === 'success' ? 'Lunas' : 'Belum Lunas'}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 text-center bg-base-200/30 rounded-3xl border border-dashed border-base-300">
+                      <History size={32} className="text-base-content/10 mb-2" />
+                      <p className="text-xs font-bold text-base-content/30 uppercase tracking-widest">Belum Ada Riwayat</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
