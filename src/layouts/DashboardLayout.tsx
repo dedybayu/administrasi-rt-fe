@@ -14,9 +14,11 @@ import {
   ChevronRight,
   TrendingDown,
   AlertCircle,
-  CreditCard
+  CreditCard,
+  Settings
 } from 'lucide-react';
 import Cookies from 'js-cookie';
+import { ProfileModal } from './components/ProfileModal';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -74,6 +76,7 @@ export default function DashboardLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>((localStorage.getItem('theme') as Theme) || 'system');
 
   const isRt = Cookies.get('user_is_rt') === 'true';
@@ -159,19 +162,23 @@ export default function DashboardLayout() {
       </div>
 
       {/* User info */}
-      <div className="px-4 py-4 mx-4 mt-6 mb-2 rounded-2xl bg-base-200 border border-base-300">
+      <button 
+        onClick={() => setIsProfileModalOpen(true)}
+        className="px-4 py-4 mx-4 mt-6 mb-2 rounded-2xl bg-base-200 border border-base-300 hover:bg-base-300 transition-colors text-left w-[calc(100%-2rem)]"
+      >
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 ${isRt ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-secondary shadow-lg shadow-secondary/30'}`}>
             {userName.charAt(0).toUpperCase()}
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="font-bold text-sm truncate">{userName}</p>
             <span className={`badge badge-xs font-bold py-2 ${isRt ? 'badge-primary' : 'badge-secondary'}`}>
               {isRt ? 'Ketua RT' : 'Warga'}
             </span>
           </div>
+          <Settings size={14} className="text-base-content/30" />
         </div>
-      </div>
+      </button>
 
       {/* Nav */}
       <nav className="flex-1 px-4 py-6 overflow-y-auto">
@@ -279,7 +286,10 @@ export default function DashboardLayout() {
             <span className="text-xs font-bold uppercase tracking-widest text-base-content/30">Administrasi RT Digital</span>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsProfileModalOpen(true)}
+              className="flex items-center gap-3 hover:bg-base-200 p-2 rounded-2xl transition-colors cursor-pointer"
+            >
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold leading-none">{userName}</p>
                 <p className="text-[10px] font-bold uppercase tracking-tighter text-base-content/40 mt-1">
@@ -289,7 +299,7 @@ export default function DashboardLayout() {
               <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-black text-white shadow-lg ${isRt ? 'bg-primary shadow-primary/20' : 'bg-secondary shadow-secondary/20'}`}>
                 {userName.charAt(0).toUpperCase()}
               </div>
-            </div>
+            </button>
           </div>
         </header>
 
@@ -329,6 +339,13 @@ export default function DashboardLayout() {
           </div>
         </div>
       )}
+
+      {/* Profile/Settings Modal */}
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        isRt={isRt}
+      />
     </div>
   );
 }
