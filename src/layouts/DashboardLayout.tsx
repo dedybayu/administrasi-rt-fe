@@ -64,11 +64,6 @@ const navItems: NavItem[] = [
     rtOnly: true,
     icon: <Home size={20} />,
   },
-  {
-    label: 'Informasi',
-    path: '/info',
-    icon: <Info size={20} />,
-  },
 ];
 
 export default function DashboardLayout() {
