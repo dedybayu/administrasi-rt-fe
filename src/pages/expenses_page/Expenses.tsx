@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { 
-  TrendingDown, 
-  Search, 
-  RefreshCw, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  TrendingDown,
+  Search,
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
   AlertCircle,
   Calendar,
   FileText,
@@ -236,13 +236,13 @@ export default function Expenses() {
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-1">
-                        <button 
+                        <button
                           onClick={() => handleEdit(e)}
                           className="btn btn-ghost btn-square btn-sm text-info hover:bg-info/10"
                         >
                           <Pencil size={16} />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(e.expense_id)}
                           className="btn btn-ghost btn-square btn-sm text-error hover:bg-error/10"
                         >
@@ -261,9 +261,9 @@ export default function Expenses() {
       {/* Pagination */}
       {!loading && totalPages > 1 && (
         <div className="flex justify-center items-center gap-3 mt-8">
-          <button 
-            className="btn btn-sm btn-ghost font-bold" 
-            onClick={() => setPage((p) => Math.max(1, p - 1))} 
+          <button
+            className="btn btn-sm btn-ghost font-bold"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             <ChevronLeft size={18} />
@@ -271,9 +271,9 @@ export default function Expenses() {
           <span className="text-xs font-black px-4 py-2 bg-base-200 rounded-xl">
             {page} / {totalPages}
           </span>
-          <button 
-            className="btn btn-sm btn-ghost font-bold" 
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))} 
+          <button
+            className="btn btn-sm btn-ghost font-bold"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
           >
             <ChevronRight size={18} />
@@ -282,7 +282,7 @@ export default function Expenses() {
       )}
 
       {/* Modals */}
-      <ExpenseModal 
+      <ExpenseModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
@@ -291,7 +291,7 @@ export default function Expenses() {
         errors={formErrors}
       />
 
-      <DeleteConfirmationModal 
+      <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}

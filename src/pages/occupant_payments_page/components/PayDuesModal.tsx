@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, ImageIcon, AlertCircle, Loader2, Save, Calendar, Wallet } from 'lucide-react';
+import { X, Upload, ImageIcon, AlertCircle, Loader2, Save, Calendar } from 'lucide-react';
 import { formatRupiah } from '../../../utils/formatters';
 
 interface Payment {

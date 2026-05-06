@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
 import {
   Wallet,
@@ -7,7 +7,6 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  Calendar,
   ChevronRight,
   Info,
   CreditCard,

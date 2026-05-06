@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from '../../utils/api';
-import { 
-  RefreshCw, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  RefreshCw,
+  ChevronLeft,
+  ChevronRight,
   Loader2,
   Home
 } from 'lucide-react';
@@ -159,7 +159,7 @@ export default function Houses() {
   const handleAddOccupant = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentHouse || !addOccupantData.occupant_id) return;
-    
+
     setSubmitting(true);
     try {
       if (editingHouseOccupantId) {
@@ -176,13 +176,13 @@ export default function Houses() {
       handleOpenDetail(currentHouse);
       setShowAddForm(false);
       setEditingHouseOccupantId(null);
-        setAddOccupantData({
-          occupant_id: '',
-          start_in_date: new Date().toISOString().split('T')[0],
-          end_in_date: '',
-          is_current: true,
-          is_head_family: false
-        });
+      setAddOccupantData({
+        occupant_id: '',
+        start_in_date: new Date().toISOString().split('T')[0],
+        end_in_date: '',
+        is_current: true,
+        is_head_family: false
+      });
       fetchHouses();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Gagal menyimpan data penghuni.');
@@ -242,8 +242,8 @@ export default function Houses() {
           <h2 className="text-3xl font-black tracking-tight text-base-content">Manajemen Data Rumah</h2>
           <p className="text-base-content/50 font-bold uppercase tracking-widest text-[10px] mt-1">Kelola informasi properti dan penghuni RT</p>
         </div>
-        <button 
-          onClick={fetchHouses} 
+        <button
+          onClick={fetchHouses}
           className="btn btn-circle btn-ghost btn-sm text-primary"
           disabled={loading}
         >
@@ -268,7 +268,7 @@ export default function Houses() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {paginated.map((house, index) => (
-              <HouseCard 
+              <HouseCard
                 key={house.house_id}
                 house={house}
                 index={index}
@@ -295,7 +295,7 @@ export default function Houses() {
           {totalPages > 1 && (
             <div className="flex justify-center mt-12 pb-8">
               <div className="join bg-base-100 shadow-xl shadow-primary/5 border border-base-300 p-1 rounded-2xl">
-                <button 
+                <button
                   className="join-item btn btn-ghost btn-sm rounded-xl font-bold"
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
@@ -305,7 +305,7 @@ export default function Houses() {
                 <div className="join-item btn btn-ghost btn-sm no-animation pointer-events-none font-black px-6">
                   Halaman {page} <span className="opacity-30 mx-2">/</span> {totalPages}
                 </div>
-                <button 
+                <button
                   className="join-item btn btn-ghost btn-sm rounded-xl font-bold"
                   onClick={() => setPage(page + 1)}
                   disabled={page === totalPages}
@@ -318,7 +318,7 @@ export default function Houses() {
         </>
       )}
 
-      <HouseModal 
+      <HouseModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSubmit={handleFormSubmit}
@@ -328,7 +328,7 @@ export default function Houses() {
         setFormData={setFormData}
       />
 
-      <HouseDetailModal 
+      <HouseDetailModal
         isOpen={isDetailModalOpen}
         onClose={handleCloseDetail}
         currentHouse={currentHouse}
@@ -346,7 +346,7 @@ export default function Houses() {
         onDeleteOccupant={handleDeleteOccupant}
       />
 
-      <DeleteConfirmationModal 
+      <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false);

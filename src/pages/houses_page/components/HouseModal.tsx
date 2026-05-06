@@ -38,29 +38,29 @@ export const HouseModal: React.FC<HouseModalProps> = ({
             <X size={20} />
           </button>
         </div>
-        
+
         <form onSubmit={onSubmit} className="p-6 space-y-5">
           <div className="form-control">
             <label className="label">
               <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Nama Pemilik / Blok</span>
             </label>
-            <input 
-              type="text" 
-              placeholder="Contoh: Bpk. Slamet / Blok A" 
+            <input
+              type="text"
+              placeholder="Contoh: Bpk. Slamet / Blok A"
               className="input input-bordered w-full font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
               value={formData.house_name}
               onChange={(e) => setFormData({ ...formData, house_name: e.target.value })}
               required
             />
           </div>
-          
+
           <div className="form-control">
             <label className="label">
               <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Nomor Rumah</span>
             </label>
-            <input 
-              type="text" 
-              placeholder="Contoh: 01" 
+            <input
+              type="text"
+              placeholder="Contoh: 01"
               className="input input-bordered w-full font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
               value={formData.house_number}
               onChange={(e) => setFormData({ ...formData, house_number: e.target.value })}
@@ -69,16 +69,16 @@ export const HouseModal: React.FC<HouseModalProps> = ({
           </div>
 
           <div className="modal-action mt-8">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="btn btn-ghost font-bold rounded-2xl px-6"
               disabled={submitting}
             >
               Batal
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary font-black rounded-2xl px-8 shadow-lg shadow-primary/20"
               disabled={submitting}
             >

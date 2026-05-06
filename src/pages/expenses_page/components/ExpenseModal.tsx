@@ -85,8 +85,8 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             </label>
             <div className="relative">
               <FileText className="absolute left-3 top-3 text-base-content/30" size={18} />
-              <textarea 
-                placeholder="Contoh: Pembayaran Listrik Pos Ronda" 
+              <textarea
+                placeholder="Contoh: Pembayaran Listrik Pos Ronda"
                 className="textarea textarea-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all min-h-[100px]"
                 value={formData.expense_description}
                 onChange={(e) => setFormData({ ...formData, expense_description: e.target.value })}
@@ -102,9 +102,9 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             </label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
-              <input 
-                type="number" 
-                placeholder="0" 
+              <input
+                type="number"
+                placeholder="0"
                 className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
                 value={formData.expense_amount}
                 onChange={(e) => setFormData({ ...formData, expense_amount: e.target.value })}
@@ -120,8 +120,8 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
             </label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
-              <input 
-                type="date" 
+              <input
+                type="date"
                 className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
                 value={formData.expense_date}
                 onChange={(e) => setFormData({ ...formData, expense_date: e.target.value })}
@@ -132,16 +132,16 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
           </div>
 
           <div className="modal-action mt-8 pt-4">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="btn btn-ghost font-bold rounded-2xl px-6"
               disabled={submitting}
             >
               Batal
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary font-black rounded-2xl px-8 shadow-lg shadow-primary/20 gap-2"
               disabled={submitting}
             >
