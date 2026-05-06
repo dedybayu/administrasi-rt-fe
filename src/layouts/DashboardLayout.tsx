@@ -13,7 +13,8 @@ import {
   Monitor,
   ChevronRight,
   TrendingDown,
-  AlertCircle
+  AlertCircle,
+  CreditCard
 } from 'lucide-react';
 import Cookies from 'js-cookie';
 
@@ -43,6 +44,11 @@ const navItems: NavItem[] = [
     path: '/payments',
     rtOnly: true,
     icon: <Wallet size={20} />,
+  },
+  {
+    label: 'Iuran Saya',
+    path: '/my-dues',
+    icon: <CreditCard size={20} />,
   },
   {
     label: 'Pengeluaran',

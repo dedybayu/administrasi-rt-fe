@@ -8,6 +8,7 @@ import { WelcomeHeader } from './components/WelcomeHeader';
 import { YearlyChart } from './components/YearlyChart';
 import { DailyChart } from './components/DailyChart';
 import { AnalysisCards } from './components/AnalysisCards';
+import { WargaDashboard } from './components/WargaDashboard';
 
 interface MonthlyData {
   month: number;
@@ -30,6 +31,10 @@ interface ReportResponse {
 }
 
 export default function Dashboard() {
+  const isRt = Cookies.get('user_is_rt') === 'true';
+  const userName = Cookies.get('user_name') || 'Pengguna';
+
+  // Admin states
   const [report, setReport] = useState<ReportResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,10 +46,8 @@ export default function Dashboard() {
   const [dailyData, setDailyData] = useState<any[]>([]);
   const [loadingDaily, setLoadingDaily] = useState(false);
 
-  const isRt = Cookies.get('user_is_rt') === 'true';
-  const userName = Cookies.get('user_name') || 'Pengguna';
-
   const fetchData = useCallback(async () => {
+    if (!isRt) return;
     setLoading(true);
     setError(null);
     try {
@@ -61,9 +64,10 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isRt]);
 
   const fetchDetailedData = useCallback(async (year: number, month: number) => {
+    if (!isRt) return;
     setLoadingDetailed(true);
     try {
       const res = await api.get('/dashboard/report-cashflow-detailed', {
@@ -75,9 +79,10 @@ export default function Dashboard() {
     } finally {
       setLoadingDetailed(false);
     }
-  }, []);
+  }, [isRt]);
 
   const fetchDailyData = useCallback(async (year: number, month: number) => {
+    if (!isRt) return;
     setLoadingDaily(true);
     try {
       const res = await api.get('/dashboard/report-cashflow-daily', {
@@ -89,13 +94,15 @@ export default function Dashboard() {
     } finally {
       setLoadingDaily(false);
     }
-  }, []);
+  }, [isRt]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => {
-    fetchDetailedData(selectedYear, selectedMonth);
-    fetchDailyData(selectedYear, selectedMonth);
-  }, [selectedYear, selectedMonth, fetchDetailedData, fetchDailyData]);
+    if (isRt) {
+      fetchDetailedData(selectedYear, selectedMonth);
+      fetchDailyData(selectedYear, selectedMonth);
+    }
+  }, [selectedYear, selectedMonth, fetchDetailedData, fetchDailyData, isRt]);
 
   const currentYearData = report?.years.find(y => y.year === selectedYear);
   const chartData = currentYearData?.monthly_data.map(m => ({
@@ -111,56 +118,62 @@ export default function Dashboard() {
       <WelcomeHeader 
         userName={userName} 
         isRt={isRt} 
-        loading={loading} 
+        loading={isRt ? loading : false} 
         totalBalance={report?.total_balance || 0} 
       />
 
-      {error && (
-        <div className="alert alert-error shadow-lg rounded-2xl border-none text-white font-bold py-4">
-          <AlertCircle size={24} />
-          <span>{error}</span>
-          <button onClick={fetchData} className="btn btn-sm btn-ghost hover:bg-white/20">Coba Lagi</button>
-        </div>
+      {isRt ? (
+        <>
+          {error && (
+            <div className="alert alert-error shadow-lg rounded-2xl border-none text-white font-bold py-4">
+              <AlertCircle size={24} />
+              <span>{error}</span>
+              <button onClick={fetchData} className="btn btn-sm btn-ghost hover:bg-white/20">Coba Lagi</button>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6 items-start">
+            <div className="flex flex-col gap-6">
+              <YearlyChart 
+                loading={loading}
+                selectedYear={selectedYear}
+                selectedMonth={selectedMonth}
+                years={report?.years || []}
+                chartData={chartData}
+                onYearChange={setSelectedYear}
+                onMonthChange={setSelectedMonth}
+                onDetailOpen={() => setIsDetailModalOpen(true)}
+              />
+
+              <DailyChart 
+                loadingDaily={loadingDaily}
+                selectedYear={selectedYear}
+                selectedMonth={selectedMonth}
+                dailyData={dailyData}
+              />
+            </div>
+
+            <AnalysisCards 
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              loadingDetailed={loadingDetailed}
+              detailedData={detailedData}
+              report={report}
+              currentYearData={currentYearData}
+              onDetailOpen={() => setIsDetailModalOpen(true)}
+            />
+          </div>
+
+          <DetailedReportModal
+            isOpen={isDetailModalOpen}
+            onClose={() => setIsDetailModalOpen(false)}
+            year={selectedYear}
+            month={selectedMonth}
+          />
+        </>
+      ) : (
+        <WargaDashboard />
       )}
-
-      <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6 items-start">
-        <div className="flex flex-col gap-6">
-          <YearlyChart 
-            loading={loading}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            years={report?.years || []}
-            chartData={chartData}
-            onYearChange={setSelectedYear}
-            onMonthChange={setSelectedMonth}
-            onDetailOpen={() => setIsDetailModalOpen(true)}
-          />
-
-          <DailyChart 
-            loadingDaily={loadingDaily}
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            dailyData={dailyData}
-          />
-        </div>
-
-        <AnalysisCards 
-          selectedYear={selectedYear}
-          selectedMonth={selectedMonth}
-          loadingDetailed={loadingDetailed}
-          detailedData={detailedData}
-          report={report}
-          currentYearData={currentYearData}
-          onDetailOpen={() => setIsDetailModalOpen(true)}
-        />
-      </div>
-
-      <DetailedReportModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        year={selectedYear}
-        month={selectedMonth}
-      />
     </div>
   );
 }
