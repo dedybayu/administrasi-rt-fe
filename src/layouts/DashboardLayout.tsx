@@ -5,7 +5,6 @@ import {
   Users, 
   Wallet, 
   Home, 
-  Info, 
   LogOut, 
   Menu, 
   Sun, 

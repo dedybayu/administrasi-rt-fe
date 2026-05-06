@@ -1,13 +1,13 @@
 import React from 'react';
-import { 
-  X, 
-  User, 
-  Home, 
-  Receipt, 
-  MapPin, 
-  Calendar, 
-  CheckCircle2, 
-  Clock, 
+import {
+  X,
+  User,
+  Home,
+  Receipt,
+  MapPin,
+  Calendar,
+  CheckCircle2,
+  Clock,
   AlertCircle,
   Phone,
   Heart,
@@ -29,6 +29,7 @@ interface Occupant {
   occupant_gender: 'L' | 'P' | null;
   house_occupants?: any[];
   payments?: any[];
+  users?: { username: string }[];
 }
 
 interface OccupantDetailModalProps {
@@ -140,6 +141,15 @@ export const OccupantDetailModal: React.FC<OccupantDetailModalProps> = ({
                 <span className="font-bold text-sm">{occupant.occupant_phone_number}</span>
               </div>
             </div>
+            <div className="card bg-base-200/50 p-4 rounded-2xl border border-base-300">
+              <p className="text-[10px] font-black uppercase tracking-widest text-base-content/40 mb-1">Username</p>
+              <div className="flex items-center gap-2 text-info">
+                <User size={16} />
+                <span className="font-bold text-sm">
+                  {occupant.users && occupant.users.length > 0 ? `@${occupant.users[0].username}` : '-'}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -149,7 +159,7 @@ export const OccupantDetailModal: React.FC<OccupantDetailModalProps> = ({
                 <MapPin size={16} className="text-primary" />
                 <h4 className="font-black text-xs uppercase tracking-widest">Informasi Hunian</h4>
               </div>
-              
+
               {currentHouse ? (
                 <div className="card bg-primary/5 border border-primary/20 p-5 rounded-2xl">
                   <div className="flex justify-between items-start mb-3">
@@ -245,14 +255,14 @@ export const OccupantDetailModal: React.FC<OccupantDetailModalProps> = ({
                   </div>
                 ) : ktpImageUrl ? (
                   <>
-                    <img 
-                      src={ktpImageUrl} 
-                      alt="KTP" 
+                    <img
+                      src={ktpImageUrl}
+                      alt="KTP"
                       className="w-full rounded-2xl shadow-md border border-base-300 hover:scale-[1.02] transition-transform duration-300"
                     />
-                    <a 
-                      href={ktpImageUrl} 
-                      target="_blank" 
+                    <a
+                      href={ktpImageUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="absolute bottom-3 right-3 btn btn-circle btn-sm bg-black/60 text-white border-none backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity"
                     >
@@ -271,8 +281,8 @@ export const OccupantDetailModal: React.FC<OccupantDetailModalProps> = ({
         </div>
 
         <div className="p-6 bg-base-200/50">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="btn btn-primary w-full font-black rounded-2xl shadow-lg shadow-primary/20"
           >
             Tutup Detail

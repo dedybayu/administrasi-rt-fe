@@ -253,7 +253,6 @@ export const OccupantModal: React.FC<OccupantModalProps> = ({
                     onChange={(e) => setFormData({ ...formData, is_married: e.target.checked })}
                   />
                   <div className="flex items-center gap-2">
-                    <Heart size={18} className={formData.is_married ? "text-rose-500 fill-rose-500" : "text-base-content/30"} />
                     <span className="label-text font-bold text-sm">Sudah Menikah</span>
                   </div>
                 </label>
