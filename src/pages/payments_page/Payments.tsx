@@ -16,7 +16,8 @@ import {
   Building2,
   User,
   Eye,
-  Plus
+  Plus,
+  Edit
 } from 'lucide-react';
 import { PaymentModal } from './components/PaymentModal';
 import { PaymentDetailModal } from './components/PaymentDetailModal';
@@ -93,19 +94,29 @@ export default function Payments() {
     setSubmitting(true);
     setFormErrors({});
     try {
-      if (Array.isArray(formData)) {
-        // Sequential requests for multi-month payment
-        for (const data of formData) {
-          await api.post('/payments', data, {
+      if (selectedPayment) {
+        // Handle Edit
+        const data = Array.isArray(formData) ? formData[0] : formData;
+        data.append('_method', 'PUT');
+        await api.post(`/payments/${selectedPayment.payment_id}`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        // Handle Create
+        if (Array.isArray(formData)) {
+          for (const data of formData) {
+            await api.post('/payments', data, {
+              headers: { 'Content-Type': 'multipart/form-data' }
+            });
+          }
+        } else {
+          await api.post('/payments', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
           });
         }
-      } else {
-        await api.post('/payments', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
       }
       setIsModalOpen(false);
+      setSelectedPayment(null);
       fetchPayments();
     } catch (err: any) {
       if (err.response?.status === 400 && err.response?.data) {
@@ -123,6 +134,17 @@ export default function Payments() {
       const res = await api.get(`/payments/${p.payment_id}`);
       setSelectedPayment(res.data.data);
       setIsDetailModalOpen(true);
+    } catch (err: any) {
+      setError('Gagal memuat detail pembayaran.');
+    }
+  };
+
+  const handleEdit = async (p: Payment) => {
+    try {
+      const res = await api.get(`/payments/${p.payment_id}`);
+      setSelectedPayment(res.data.data);
+      setFormErrors({});
+      setIsModalOpen(true);
     } catch (err: any) {
       setError('Gagal memuat detail pembayaran.');
     }
@@ -388,6 +410,13 @@ export default function Payments() {
                         >
                           <Eye size={14} />
                         </button>
+                        <button
+                          onClick={() => handleEdit(p)}
+                          className="btn btn-ghost btn-square btn-xs hover:bg-secondary/20 hover:text-secondary transition-colors"
+                          title="Edit Iuran / Verifikasi"
+                        >
+                          <Edit size={14} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -428,15 +457,16 @@ export default function Payments() {
       {/* Modals */}
       <PaymentModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { setIsModalOpen(false); setSelectedPayment(null); }}
         onSubmit={handleSubmit}
         submitting={submitting}
         errors={formErrors}
+        initialData={selectedPayment}
       />
 
       <PaymentDetailModal
         isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
+        onClose={() => { setIsDetailModalOpen(false); setSelectedPayment(null); }}
         payment={selectedPayment}
       />
     </div>

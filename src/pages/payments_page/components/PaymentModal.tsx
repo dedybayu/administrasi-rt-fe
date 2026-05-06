@@ -28,6 +28,7 @@ interface PaymentModalProps {
   onSubmit: (formData: FormData | FormData[]) => void;
   submitting: boolean;
   errors: Record<string, string[]>;
+  initialData?: any;
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({
@@ -35,7 +36,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   onClose,
   onSubmit,
   submitting,
-  errors
+  errors,
+  initialData
 }) => {
   const [formData, setFormData] = useState({
     dues_type_id: '',
@@ -66,24 +68,40 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       api.get('/dues-types').then(res => setDuesTypes(res.data.data ?? res.data));
       api.get('/house-occupants').then(res => setHouseOccupants(res.data.data ?? res.data));
 
-      setOperationType('pay');
-      setFormData({
-        dues_type_id: '',
-        house_occupant_id: '',
-        payer_occupant_id: '',
-        payment_amount: '',
-        payment_date: new Date().toISOString().split('T')[0],
-        payment_period_month: (new Date().getMonth() + 1).toString(),
-        payment_period_year: new Date().getFullYear().toString(),
-        payment_status: 'success',
-        payment_duration: '1',
-      });
+      if (initialData) {
+        setFormData({
+          dues_type_id: initialData.dues_type_id?.toString() || '',
+          house_occupant_id: initialData.house_occupant_id?.toString() || '',
+          payer_occupant_id: initialData.payer_occupant_id?.toString() || '',
+          payment_amount: initialData.payment_amount?.toString() || '',
+          payment_date: initialData.payment_date || new Date().toISOString().split('T')[0],
+          payment_period_month: initialData.payment_period_month?.toString() || '',
+          payment_period_year: initialData.payment_period_year?.toString() || '',
+          payment_status: initialData.payment_status || '',
+          payment_duration: '1',
+        });
+        setOperationType(initialData.payment_status ? 'pay' : 'bill');
+        setPreviewUrl(initialData.payment_proof_url || null);
+      } else {
+        setOperationType('pay');
+        setFormData({
+          dues_type_id: '',
+          house_occupant_id: '',
+          payer_occupant_id: '',
+          payment_amount: '',
+          payment_date: new Date().toISOString().split('T')[0],
+          payment_period_month: (new Date().getMonth() + 1).toString(),
+          payment_period_year: new Date().getFullYear().toString(),
+          payment_status: 'success',
+          payment_duration: '1',
+        });
+        setPreviewUrl(null);
+      }
       setSelectedFile(null);
-      setPreviewUrl(null);
       setSearchTerm('');
       setIsDropdownOpen(false);
     }
-  }, [isOpen]);
+  }, [isOpen, initialData]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -136,11 +154,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     setOperationType(type);
     setFormData({
       ...formData,
-      payment_status: type === 'pay' ? 'success' : '', // Set to empty string for null on backend
+      payment_status: type === 'pay' ? (formData.payment_status || 'success') : '', // Set to empty string for null on backend
     });
     if (type === 'bill') {
       setSelectedFile(null);
-      setPreviewUrl(null);
+      if (!initialData) setPreviewUrl(null);
     }
   };
 
@@ -394,53 +412,72 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               </div>
             </div>
 
-            <div className="form-control">
-              <label className="label">
-                <span className={`label-text font-black text-xs uppercase tracking-wider ${operationType === 'pay' ? 'text-primary' : 'text-base-content/50'}`}>
-                  {operationType === 'pay' ? 'Bayar Sekaligus' : 'Tagih Sekaligus'} (Durasi Bulan)
-                </span>
-              </label>
-              <div className="relative">
-                <Clock className={`absolute left-3 top-1/2 -translate-y-1/2 ${operationType === 'pay' ? 'text-primary/30' : 'text-base-content/30'}`} size={18} />
-                <input
-                  type="number"
-                  min="1"
-                  max="12"
-                  className={`input input-bordered w-full pl-10 font-bold transition-all ${operationType === 'pay' ? 'bg-primary/5 border-primary/20 focus:bg-primary/10 text-primary' : 'bg-base-200/50 border-none focus:bg-base-100'}`}
-                  placeholder="Contoh: 3 (untuk 3 bulan sekaligus)"
-                  value={formData.payment_duration}
-                  onChange={(e) => setFormData({ ...formData, payment_duration: e.target.value })}
-                />
-              </div>
-              {getDurationSummary() && (
-                <div className={`mt-2 p-3 rounded-xl border flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${operationType === 'pay' ? 'bg-primary/10 border-primary/20' : 'bg-base-200/50 border-base-300'}`}>
-                  <Calendar size={14} className={operationType === 'pay' ? 'text-primary' : 'text-base-content/40'} />
-                  <p className={`text-[11px] font-black uppercase tracking-wider ${operationType === 'pay' ? 'text-primary' : 'text-base-content/60'}`}>
-                    {getDurationSummary()}
-                  </p>
-                </div>
-              )}
-              <p className={`text-[10px] font-bold mt-1.5 uppercase tracking-tight ml-1 ${operationType === 'pay' ? 'text-primary/50' : 'text-base-content/40'}`}>
-                {operationType === 'pay' 
-                  ? 'Bukti pembayaran akan diduplikasi otomatis untuk setiap bulan.'
-                  : 'Tagihan akan dibuat terpisah untuk setiap bulan.'}
-              </p>
-            </div>
-
-            {operationType === 'pay' && (
+            {!initialData && (
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Tanggal Bayar</span>
+                  <span className={`label-text font-black text-xs uppercase tracking-wider ${operationType === 'pay' ? 'text-primary' : 'text-base-content/50'}`}>
+                    {operationType === 'pay' ? 'Bayar Sekaligus' : 'Tagih Sekaligus'} (Durasi Bulan)
+                  </span>
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                  <Clock className={`absolute left-3 top-1/2 -translate-y-1/2 ${operationType === 'pay' ? 'text-primary/30' : 'text-base-content/30'}`} size={18} />
                   <input
-                    type="date"
-                    className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
-                    value={formData.payment_date}
-                    onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
-                    required
+                    type="number"
+                    min="1"
+                    max="12"
+                    className={`input input-bordered w-full pl-10 font-bold transition-all ${operationType === 'pay' ? 'bg-primary/5 border-primary/20 focus:bg-primary/10 text-primary' : 'bg-base-200/50 border-none focus:bg-base-100'}`}
+                    placeholder="Contoh: 3 (untuk 3 bulan sekaligus)"
+                    value={formData.payment_duration}
+                    onChange={(e) => setFormData({ ...formData, payment_duration: e.target.value })}
                   />
+                </div>
+                {getDurationSummary() && (
+                  <div className={`mt-2 p-3 rounded-xl border flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${operationType === 'pay' ? 'bg-primary/10 border-primary/20' : 'bg-base-200/50 border-base-300'}`}>
+                    <Calendar size={14} className={operationType === 'pay' ? 'text-primary' : 'text-base-content/40'} />
+                    <p className={`text-[11px] font-black uppercase tracking-wider ${operationType === 'pay' ? 'text-primary' : 'text-base-content/60'}`}>
+                      {getDurationSummary()}
+                    </p>
+                  </div>
+                )}
+                <p className={`text-[10px] font-bold mt-1.5 uppercase tracking-tight ml-1 ${operationType === 'pay' ? 'text-primary/50' : 'text-base-content/40'}`}>
+                  {operationType === 'pay' 
+                    ? 'Bukti pembayaran akan diduplikasi otomatis untuk setiap bulan.'
+                    : 'Tagihan akan dibuat terpisah untuk setiap bulan.'}
+                </p>
+              </div>
+            )}
+
+            {operationType === 'pay' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Tanggal Bayar</span>
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/30" size={18} />
+                    <input
+                      type="date"
+                      className="input input-bordered w-full pl-10 font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all"
+                      value={formData.payment_date}
+                      onChange={(e) => setFormData({ ...formData, payment_date: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-black text-xs uppercase tracking-wider text-base-content/50">Status</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full font-bold bg-base-200/50 border-none focus:bg-base-100 transition-all text-sm"
+                    value={formData.payment_status}
+                    onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
+                  >
+                    <option value="pending">Menunggu Konfirmasi</option>
+                    <option value="success">Berhasil / Lunas</option>
+                    <option value="rejected">Ditolak</option>
+                  </select>
                 </div>
               </div>
             )}
