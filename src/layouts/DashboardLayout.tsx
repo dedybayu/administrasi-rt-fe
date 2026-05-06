@@ -12,7 +12,8 @@ import {
   Moon,
   Monitor,
   ChevronRight,
-  TrendingDown
+  TrendingDown,
+  AlertCircle
 } from 'lucide-react';
 import Cookies from 'js-cookie';
 
@@ -66,6 +67,7 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [theme, setTheme] = useState<Theme>((localStorage.getItem('theme') as Theme) || 'system');
 
   const isRt = Cookies.get('user_is_rt') === 'true';
@@ -101,6 +103,10 @@ export default function DashboardLayout() {
   };
 
   const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const executeLogout = () => {
     Cookies.remove('token');
     Cookies.remove('refresh_token');
     Cookies.remove('user_is_rt');
@@ -286,6 +292,37 @@ export default function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-base-100 w-full max-w-sm rounded-[2rem] shadow-2xl border border-base-300 overflow-hidden animate-zoom-in">
+            <div className="p-8 text-center">
+              <div className="w-20 h-20 bg-error/10 text-error rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle size={40} />
+              </div>
+              <h3 className="text-2xl font-black mb-2">Konfirmasi Keluar</h3>
+              <p className="text-base-content/60 font-medium mb-8">
+                Apakah Anda yakin ingin keluar dari sesi administrasi ini?
+              </p>
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={executeLogout}
+                  className="btn btn-error btn-lg rounded-2xl normal-case font-black shadow-lg shadow-error/20"
+                >
+                  Ya, Keluar Sekarang
+                </button>
+                <button 
+                  onClick={() => setShowLogoutModal(false)}
+                  className="btn btn-ghost btn-lg rounded-2xl normal-case font-bold"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

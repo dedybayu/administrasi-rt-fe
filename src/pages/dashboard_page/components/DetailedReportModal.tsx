@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, TrendingUp, TrendingDown, Calendar, Loader2, Download, Printer, PieChart, AlertCircle } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, Calendar, Loader2, Download, Printer, AlertCircle } from 'lucide-react';
 import api from '../../../utils/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
