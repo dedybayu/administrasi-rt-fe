@@ -3,19 +3,20 @@
 Antarmuka pengguna untuk sistem administrasi RT yang dibangun menggunakan React, TypeScript, dan Tailwind CSS.
 
 ## Teknologi Utama
-- **Framework**: React 18
+- **Framework**: React 19
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS & DaisyUI
 - **Icons**: Lucide React
 - **State Management**: React Hooks & Context API
 - **HTTP Client**: Axios (dengan interceptor untuk Refresh Token)
+- **Minimum Node.js**: v20.x (LTS) atau lebih baru
 
 ---
 
 ## Panduan Instalasi (Development)
 
 ### 1. Prasyarat
-- Node.js (versi 18 ke atas disarankan)
+- **Node.js (Minimum v20.x)** — Disarankan menggunakan versi LTS terbaru.
 - npm atau yarn
 
 ### 2. Kloning Repositori
@@ -47,7 +48,7 @@ Aplikasi akan berjalan di `http://localhost:5173`.
 ## Panduan Instalasi (Production)
 
 ### 1. Prasyarat
-- Node.js (versi 18 ke atas disarankan)
+- **Node.js (Minimum v20.x)** — Disarankan menggunakan versi LTS terbaru.
 - npm atau yarn
 
 ### 2. Kloning Repositori
