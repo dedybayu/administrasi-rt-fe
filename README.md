@@ -137,4 +137,96 @@ Aplikasi ini bergantung sepenuhnya pada API dari repositori backend. Pastikan ba
 
 <br>
 
-# Dokumentasi Hasil Tampilan
+# Dokumentasi Tampilan Antarmuka
+
+Berikut adalah rincian tampilan antarmuka Sistem Administrasi RT untuk berbagai fitur dan peran pengguna.
+
+## 1. Halaman Publik & Autentikasi
+
+Halaman awal yang dapat diakses oleh publik dan proses masuk ke dalam sistem.
+
+### Landing Page
+![Landing Page](./readme_img/landing_page.png)
+
+### Login Page
+![Login Page](./readme_img/login_page.png)
+
+### Dark Mode Feature
+![Dark Mode](./readme_img/dark_mode_feature.png)
+
+---
+
+## 2. Peran: Ketua RT (Administrator)
+
+Ketua RT memiliki akses penuh untuk mengelola data warga, keuangan, dan melihat laporan statistik.
+
+### A. Dashboard & Statistik
+Dashboard interaktif dengan grafik arus kas (cashflow), perbandingan bulanan, dan laporan harian.
+
+#### Main Dashboard
+![Dashboard RT](./readme_img/role_rt/dashboard/dashboard_page.png)
+
+#### Detail Keuangan Bulanan (Modal)
+![Detail Modal](./readme_img/role_rt/dashboard/detail_keuangan_bulanan_modal.png)
+
+#### Ekspor Laporan PDF
+![PDF Export](./readme_img/role_rt/dashboard/detail_keuangan_bulanan_pdf_export.png)
+
+### B. Manajemen Rumah & Penghuni
+Mengelola unit properti dan mencatat riwayat penghuni (Tetap, Kontrak, atau Sewa).
+
+#### Daftar Rumah
+![House List](./readme_img/role_rt/houses/house_list.png)
+
+#### Detail Rumah & Penghuni
+![House Detail](./readme_img/role_rt/houses/house_detail.png)
+
+#### Form Tambah Penghuni
+![Add Occupant](./readme_img/role_rt/houses/add_house_occupant.png)
+
+### C. Manajemen Warga
+Basis data warga lengkap dengan informasi status perkawinan, nomor telepon, dan foto KTP.
+
+#### Daftar Warga
+![Occupant List](./readme_img/role_rt/occupants/occupant_list.png)
+
+#### Detail Profil Warga
+![Occupant Detail](./readme_img/role_rt/occupants/show_occupant.png)
+
+#### Form Tambah Warga
+![Create Occupant](./readme_img/role_rt/occupants/create_occupant.png)
+
+### D. Keuangan: Iuran & Pengeluaran
+Pencatatan pemasukan dari warga dan pengeluaran kas RT secara transparan.
+
+#### Daftar Pembayaran Iuran
+![Payment List](./readme_img/role_rt/payments/payment_list.png)
+
+#### Verifikasi Pembayaran Warga
+![Verification](./readme_img/role_rt/payments/payment_verification.png)
+
+#### Daftar Pengeluaran Kas
+![Expense List](./readme_img/role_rt/expenses/expenses_list.png)
+
+---
+
+## 3. Peran: Warga
+
+Warga dapat memantau status iuran pribadi, melakukan konfirmasi pembayaran, dan melihat pengumuman dashboard.
+
+### Dashboard Warga
+![Dashboard Warga](./readme_img/role_occupant/dashboard.png)
+
+### Status Iuran Saya
+![My Dues](./readme_img/role_occupant/my_dues.png)
+
+### Form Konfirmasi Pembayaran (Upload Bukti)
+![Pay Dues](./readme_img/role_occupant/pay_dues.png)
+
+### Status Pembayaran Menunggu Verifikasi
+![Pending Payment](./readme_img/role_occupant/after_pay_dues_pending.png)
+
+### Update Profil & Password
+![Update Profile](./readme_img/role_occupant/update_password.png)
+
+---
