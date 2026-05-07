@@ -273,6 +273,12 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                                 {ho.start_in_date ? new Date(ho.start_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} — {ho.end_in_date ? new Date(ho.end_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Sekarang'}
                               </span>
                             </div>
+                            {ho.occupant.occupant_phone_number && (
+                              <div className="flex items-center gap-1.5 mt-0.5 opacity-50">
+                                <Phone size={10} />
+                                <span className="text-[9px] font-bold uppercase tracking-tight">{ho.occupant.occupant_phone_number}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="flex gap-1">
