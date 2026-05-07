@@ -98,7 +98,6 @@ export default function Login() {
                   <label className="label py-1">
                     <span className="label-text font-black text-xs uppercase tracking-widest text-base-content/40">Password</span>
                   </label>
-                  <a href="#" className="text-[10px] font-black uppercase tracking-wider text-primary hover:underline">Lupa Password?</a>
                 </div>
                 <label className="input input-bordered h-14 rounded-2xl flex items-center gap-4 w-full border-base-300 focus-within:border-primary transition-all">
                   <Lock size={20} className="text-base-content/30" />
@@ -139,12 +138,8 @@ export default function Login() {
         </div>
 
         {/* Footer info */}
-        <div className="flex flex-col items-center gap-4 mt-12">
-          <div className="flex gap-6">
-            <a href="/" className="text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-primary transition-colors">Beranda</a>
-            <a href="#" className="text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-primary transition-colors">Privasi</a>
-            <a href="#" className="text-[10px] font-black uppercase tracking-widest text-base-content/40 hover:text-primary transition-colors">Bantuan</a>
-          </div>
+        <div className="flex flex-col items-center gap-4 mt-16">
+
           <p className="text-base-content/20 text-[10px] font-bold uppercase tracking-widest">
             © 2026 E-RT Digital Ecosystem
           </p>
