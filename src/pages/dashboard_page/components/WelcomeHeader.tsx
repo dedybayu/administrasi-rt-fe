@@ -37,10 +37,6 @@ export const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({ userName, isRt, lo
               formatRupiah(totalBalance)
             )}
           </h2>
-          <div className="mt-4 flex items-center gap-2">
-            <span className="badge badge-success badge-sm text-[10px] font-bold text-white py-2">AKTIF</span>
-            <span className="text-[10px] text-white/50 font-bold uppercase italic">Update Real-time</span>
-          </div>
         </div>
       </div>
 
