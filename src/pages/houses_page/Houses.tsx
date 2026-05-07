@@ -257,7 +257,7 @@ export default function Houses() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 gap-4 bg-base-100 rounded-3xl border border-base-300 shadow-inner">
           <Loader2 size={48} className="animate-spin text-primary" />
-          <p className="font-black text-xs uppercase tracking-[0.2em] text-base-content/30">Menyinkronkan Data Properti...</p>
+          <p className="font-black text-xs uppercase tracking-[0.2em] text-base-content/30">Memuat Data Rumah...</p>
         </div>
       ) : error ? (
         <div className="alert alert-error shadow-xl rounded-2xl border-none text-white font-bold animate-in slide-in-from-top-4">

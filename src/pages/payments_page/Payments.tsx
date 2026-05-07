@@ -17,7 +17,8 @@ import {
   User,
   Eye,
   Plus,
-  Edit
+  Edit,
+  Trash2
 } from 'lucide-react';
 import { PaymentModal } from './components/PaymentModal';
 import { PaymentDetailModal } from './components/PaymentDetailModal';
@@ -73,8 +74,10 @@ export default function Payments() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
 
   const fetchPayments = useCallback(async () => {
@@ -147,6 +150,21 @@ export default function Payments() {
       setIsModalOpen(true);
     } catch (err: any) {
       setError('Gagal memuat detail pembayaran.');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedPayment) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/payments/${selectedPayment.payment_id}`);
+      setIsDeleteModalOpen(false);
+      setSelectedPayment(null);
+      fetchPayments();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Gagal menghapus iuran.');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -417,6 +435,13 @@ export default function Payments() {
                         >
                           <Edit size={14} />
                         </button>
+                        <button
+                          onClick={() => { setSelectedPayment(p); setIsDeleteModalOpen(true); }}
+                          className="btn btn-ghost btn-square btn-xs hover:bg-error/20 hover:text-error transition-colors"
+                          title="Hapus Iuran"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -469,6 +494,47 @@ export default function Payments() {
         onClose={() => { setIsDetailModalOpen(false); setSelectedPayment(null); }}
         payment={selectedPayment}
       />
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm rounded-3xl border border-base-300 shadow-2xl p-0 overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6 bg-error/10 text-error flex flex-col items-center gap-4 text-center">
+              <div className="w-16 h-16 rounded-full bg-error text-error-content flex items-center justify-center shadow-lg shadow-error/20 animate-bounce-short">
+                <AlertCircle size={32} />
+              </div>
+              <div>
+                <h3 className="font-black text-xl leading-tight">Hapus Iuran?</h3>
+                <p className="text-xs font-bold uppercase tracking-widest opacity-70 mt-1">Tindakan ini tidak bisa dibatalkan</p>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="p-4 rounded-2xl bg-base-200 border border-base-300">
+                <p className="text-[10px] font-black uppercase tracking-widest text-base-content/40 mb-1">Detail Transaksi</p>
+                <p className="font-black text-base-content">{selectedPayment?.dues_type_name}</p>
+                <p className="text-xs font-bold text-base-content/60">{selectedPayment?.occupant_name} - {selectedPayment?.house_name}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <button 
+                  onClick={handleDelete}
+                  className="btn btn-error w-full font-black rounded-2xl shadow-lg shadow-error/20"
+                  disabled={deleting}
+                >
+                  {deleting ? <RefreshCw className="animate-spin" size={20} /> : 'Ya, Hapus Data'}
+                </button>
+                <button 
+                  onClick={() => { setIsDeleteModalOpen(false); setSelectedPayment(null); }}
+                  className="btn btn-ghost w-full font-black rounded-2xl"
+                  disabled={deleting}
+                >
+                  Batalkan
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop bg-black/40 backdrop-blur-sm" onClick={() => setIsDeleteModalOpen(false)}></div>
+        </div>
+      )}
     </div>
   );
 }
