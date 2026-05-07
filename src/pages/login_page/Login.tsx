@@ -39,23 +39,7 @@ export default function Login() {
   return (
     <main className="min-h-screen bg-base-200 flex items-center justify-center px-4 pt-24 pb-12">
       <div className="w-full max-w-md relative">
-        {/* Decorative background blobs */}
-        <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-secondary/10 rounded-full blur-3xl" />
-
-        {/* Logo/Brand Section */}
-        <div className="text-center mb-10 flex flex-col items-center relative z-10">
-          <div className="w-20 h-20 rounded-[2rem] bg-primary flex items-center justify-center mb-6 shadow-2xl shadow-primary/40 group hover:rotate-6 transition-transform duration-500">
-            <Building2 size={40} className="text-primary-content" />
-          </div>
-          <h1 className="text-4xl font-black text-primary tracking-tight">
-            E-RT Digital
-          </h1>
-          <p className="text-base-content/50 font-bold mt-2 uppercase tracking-widest text-[10px]">
-            Sistem Administrasi Lingkungan
-          </p>
-        </div>
-
+        
         {/* Login Card */}
         <div className="card bg-base-100 shadow-2xl rounded-[2.5rem] border border-base-300 relative z-10 overflow-hidden">
           {/* Top accent line */}
@@ -135,14 +119,6 @@ export default function Login() {
               <a href="#" className="text-primary font-black hover:underline">Hubungi Ketua RT</a>
             </p>
           </div>
-        </div>
-
-        {/* Footer info */}
-        <div className="flex flex-col items-center gap-4 mt-16">
-
-          <p className="text-base-content/20 text-[10px] font-bold uppercase tracking-widest">
-            © 2026 E-RT Digital Ecosystem
-          </p>
         </div>
       </div>
     </main>
