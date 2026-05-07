@@ -70,7 +70,7 @@ export default function Navbar() {
 
             {/* LOGO */}
             <a className="btn btn-ghost text-2xl font-extrabold">
-              Gawean
+              E-RT Digital
             </a>
           </div>
 

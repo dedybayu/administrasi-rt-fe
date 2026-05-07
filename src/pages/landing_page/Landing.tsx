@@ -14,7 +14,7 @@ export default function Landing() {
         <div className="hero-content text-center relative z-10 px-6">
           <div className="max-w-4xl">
             <div className="badge badge-primary badge-outline font-bold mb-6 py-3 px-4 animate-bounce">
-              Digitalisasi Administrasi RT v2.0
+              Digitalisasi Administrasi RT
             </div>
             
             <h1 className="text-5xl md:text-7xl font-black mb-8 text-base-content leading-[1.1] tracking-tight">
@@ -71,13 +71,6 @@ export default function Landing() {
               bg="bg-success/10"
             />
             <Feature
-              icon={<Bell size={24} />}
-              title="Laporan Warga"
-              desc="Warga dapat mengirim laporan atau keluhan langsung melalui sistem kepada Ketua RT."
-              color="text-warning"
-              bg="bg-warning/10"
-            />
-            <Feature
               icon={<Shield size={24} />}
               title="Keamanan Data"
               desc="Data warga dilindungi dengan sistem enkripsi standar industri."
@@ -107,27 +100,6 @@ export default function Landing() {
                 E-RT Digital dibuat untuk membantu Ketua RT dan warga mengatur urusan lingkungan
                 menggunakan teknologi yang mudah digunakan oleh semua kalangan.
               </p>
-
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="mt-1 bg-primary/20 p-1.5 rounded-lg text-primary">
-                    <Clock size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold">Efisiensi Waktu</h4>
-                    <p className="text-sm text-base-content/60">Tidak perlu lagi menulis manual di buku kas yang tebal.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="mt-1 bg-success/20 p-1.5 rounded-lg text-success">
-                    <Shield size={18} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold">Transparansi Dana</h4>
-                    <p className="text-sm text-base-content/60">Warga dapat melihat laporan keuangan RT secara terbuka.</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="order-1 lg:order-2">
