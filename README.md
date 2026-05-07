@@ -82,16 +82,43 @@ location / {
 ```
 
 #### Opsi Deployment dengan PM2
-Jika Anda ingin menjalankan aplikasi di server VPS menggunakan PM2:
-1. Pastikan `pm2` dan package `serve` sudah terinstal:
+
+PM2 adalah process manager untuk Node.js yang memungkinkan Anda menjalankan aplikasi di background dan memastikan aplikasi tetap berjalan (auto-restart).
+
+**1. Instalasi PM2 & Serve secara Global**
+Instal PM2 dan package `serve` untuk melayani file statis:
+```bash
+npm install -g pm2 serve
+```
+
+**2. Jalankan Aplikasi**
+Gunakan perintah berikut untuk menjalankan folder `dist` pada port tertentu (contoh: 5173):
+```bash
+pm2 serve dist 5173 --spa --name "administrasi-rt-fe"
+```
+- `--spa`: Memastikan semua rute diarahkan ke `index.html` (penting untuk React Router).
+- `--name`: Memberikan nama proses agar mudah dikelola.
+
+**3. Manajemen Proses PM2**
+Berikut adalah beberapa perintah dasar untuk mengelola aplikasi:
+- **Melihat status**: `pm2 status` atau `pm2 list`
+- **Melihat log**: `pm2 logs administrasi-rt-fe`
+- **Memberhentikan aplikasi**: `pm2 stop administrasi-rt-fe`
+- **Menjalankan ulang**: `pm2 restart administrasi-rt-fe`
+- **Menghapus dari daftar**: `pm2 delete administrasi-rt-fe`
+
+**4. Konfigurasi Persistence (Auto-start saat Reboot)**
+Agar aplikasi otomatis berjalan kembali saat server/VPS di-reboot:
+1. Simpan daftar proses yang sedang berjalan:
    ```bash
-   npm install -g pm2 serve
+   pm2 save
    ```
-2. Jalankan aplikasi menggunakan PM2:
+2. Buat script startup:
    ```bash
-   pm2 serve dist 5173 --spa --name "administrasi-rt-fe"
+   pm2 startup
    ```
-   *Ganti `5173` dengan port yang Anda inginkan.*
+3. Jalankan perintah yang muncul di terminal (biasanya diawali dengan `sudo env PATH=...`).
+
 
 ---
 
