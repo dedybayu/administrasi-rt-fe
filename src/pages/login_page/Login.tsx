@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, AlertCircle, Building2, ArrowRight } from 'lucide-react';
+import { User, Lock, AlertCircle, ArrowRight } from 'lucide-react';
 import Cookies from 'js-cookie';
 import api from '../../utils/api';
 
@@ -39,7 +39,7 @@ export default function Login() {
   return (
     <main className="min-h-screen bg-base-200 flex items-center justify-center px-4 pt-24 pb-12">
       <div className="w-full max-w-md relative">
-        
+
         {/* Login Card */}
         <div className="card bg-base-100 shadow-2xl rounded-[2.5rem] border border-base-300 relative z-10 overflow-hidden">
           {/* Top accent line */}
