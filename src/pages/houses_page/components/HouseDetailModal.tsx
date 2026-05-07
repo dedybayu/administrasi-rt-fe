@@ -158,20 +158,32 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                     required
                   />
                 </div>
-                {!addOccupantData.is_current && (
-                  <div className="form-control col-span-2 sm:col-span-2 animate-in slide-in-from-left-2 duration-200">
-                    <label className="label py-1">
-                      <span className="label-text font-black text-[10px] uppercase tracking-wider text-error font-bold">Tanggal Berakhir (Wajib jika tidak aktif)</span>
-                    </label>
-                    <input 
-                      type="date" 
-                      className="input input-bordered input-sm w-full font-bold bg-base-100 border-error/30"
-                      value={addOccupantData.end_in_date}
-                      onChange={(e) => setAddOccupantData({ ...addOccupantData, end_in_date: e.target.value })}
-                      required={!addOccupantData.is_current}
-                    />
-                  </div>
-                )}
+                <div className="form-control col-span-2 sm:col-span-2 animate-in slide-in-from-left-2 duration-200">
+                  <label className="label py-1">
+                    <span className={`label-text font-black text-[10px] uppercase tracking-wider font-bold ${!addOccupantData.is_current ? 'text-error' : 'opacity-50'}`}>
+                      {addOccupantData.is_current ? 'Rencana Tanggal Berakhir (Opsional)' : 'Tanggal Berakhir (Wajib jika tidak aktif)'}
+                    </span>
+                  </label>
+                  <input 
+                    type="date" 
+                    className={`input input-bordered input-sm w-full font-bold bg-base-100 ${!addOccupantData.is_current ? 'border-error/30' : 'border-base-300'}`}
+                    value={addOccupantData.end_in_date || ''}
+                    min={addOccupantData.is_current ? new Date().toISOString().split('T')[0] : undefined}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      const today = new Date().toISOString().split('T')[0];
+                      
+                      // Client-side check for active occupant
+                      if (addOccupantData.is_current && value && value < today) {
+                        alert("Tanggal berakhir untuk penghuni aktif tidak boleh sebelum hari ini.");
+                        return;
+                      }
+                      
+                      setAddOccupantData({ ...addOccupantData, end_in_date: value });
+                    }}
+                    required={!addOccupantData.is_current}
+                  />
+                </div>
               </div>
               <div className="flex items-center justify-between gap-4">
                 <label className="label cursor-pointer justify-start gap-2 py-0">
@@ -179,7 +191,21 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                     type="checkbox" 
                     className="checkbox checkbox-secondary checkbox-sm rounded-md"
                     checked={addOccupantData.is_current}
-                    onChange={(e) => setAddOccupantData({ ...addOccupantData, is_current: e.target.checked })}
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      const today = new Date().toISOString().split('T')[0];
+                      let newEndDate = addOccupantData.end_in_date;
+                      
+                      if (isChecked && newEndDate && newEndDate < today) {
+                        newEndDate = '';
+                      }
+                      
+                      setAddOccupantData({ 
+                        ...addOccupantData, 
+                        is_current: isChecked,
+                        end_in_date: newEndDate
+                      });
+                    }}
                   />
                   <span className="label-text font-bold text-[10px] uppercase tracking-wider opacity-50">Penghuni Aktif</span>
                 </label>
@@ -244,7 +270,7 @@ export const HouseDetailModal: React.FC<HouseDetailModalProps> = ({
                             <div className="flex items-center gap-1.5 mt-1 opacity-50">
                               <Calendar size={10} />
                               <span className="text-[9px] font-bold uppercase tracking-tight">
-                                {ho.start_in_date ? new Date(ho.start_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} — {ho.is_current ? 'Sekarang' : (ho.end_in_date ? new Date(ho.end_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-')}
+                                {ho.start_in_date ? new Date(ho.start_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'} — {ho.end_in_date ? new Date(ho.end_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Sekarang'}
                               </span>
                             </div>
                           </div>
