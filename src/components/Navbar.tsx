@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 export default function Navbar() {
   const [theme, setTheme] = useState("auto")
 
-  const applyTheme = (mode) => {
+  const applyTheme = (mode: string) => {
     if (mode === "auto") {
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
       document.documentElement.setAttribute(
@@ -131,7 +131,11 @@ export default function Navbar() {
 }
 
 /* ---------- SVG ICON ---------- */
-function ThemeIcon({ mode }) {
+interface ThemeIconProps {
+  mode: string;
+}
+
+function ThemeIcon({ mode }: ThemeIconProps) {
   return (
     <svg
       viewBox="0 0 24 24"

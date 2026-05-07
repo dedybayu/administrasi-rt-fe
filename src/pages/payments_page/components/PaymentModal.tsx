@@ -47,7 +47,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     payment_date: new Date().toISOString().split('T')[0],
     payment_period_month: (new Date().getMonth() + 1).toString(),
     payment_period_year: new Date().getFullYear().toString(),
-    payment_status: 'success' as string | null,
+    payment_status: 'success' as string,
     payment_duration: '1',
   });
 

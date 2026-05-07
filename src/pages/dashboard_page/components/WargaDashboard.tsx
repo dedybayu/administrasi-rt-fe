@@ -214,7 +214,7 @@ export const WargaDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  {data?.unpaid_payments.length > 5 && (
+                  {(data?.unpaid_payments?.length ?? 0) > 5 && (
                     <button 
                       onClick={() => navigate('/my-dues')}
                       className="btn btn-ghost btn-block btn-sm rounded-xl mt-4 font-bold text-primary gap-2"

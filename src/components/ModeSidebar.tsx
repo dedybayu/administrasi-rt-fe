@@ -3,8 +3,13 @@ import SunIcon from "./icons/SunIcon";
 import MoonIcon from "./icons/MoonIcon";
 import AutoIcon from "./icons/AutoIcon";
 
-export default function ModeSidebar({ open, onClose }) {
-  const setTheme = (mode) => {
+interface ModeSidebarProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function ModeSidebar({ open, onClose }: ModeSidebarProps) {
+  const setTheme = (mode: string) => {
     localStorage.setItem("theme", mode);
 
     if (mode === "auto") {
@@ -65,7 +70,13 @@ export default function ModeSidebar({ open, onClose }) {
   );
 }
 
-function ModeButton({ label, children, onClick }) {
+interface ModeButtonProps {
+  label: string;
+  children: React.ReactNode;
+  onClick: () => void;
+}
+
+function ModeButton({ label, children, onClick }: ModeButtonProps) {
   return (
     <button
       onClick={onClick}
