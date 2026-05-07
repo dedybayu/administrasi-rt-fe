@@ -105,7 +105,7 @@ export default function Login() {
                   <span className="loading loading-spinner"></span>
                 ) : (
                   <>
-                    Masuk Ke Portal
+                    Masuk
                     <ArrowRight size={20} className="ml-1" />
                   </>
                 )}
