@@ -1,4 +1,4 @@
-import { Home, Users, Wallet, ArrowRight, Shield, Bell, Clock } from 'lucide-react';
+import { Home, Users, Wallet, ArrowRight, Shield} from 'lucide-react';
 
 export default function Landing() {
   return (
