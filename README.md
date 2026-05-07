@@ -2,6 +2,12 @@
 
 Antarmuka pengguna untuk sistem administrasi RT yang dibangun menggunakan React, TypeScript, dan Tailwind CSS.
 
+### 🚀 Live Demo
+Aplikasi ini sudah dideploy dan dapat diakses melalui:
+**[https://adm-rt.dbsnetwork.my.id/](https://adm-rt.dbsnetwork.my.id/)**
+
+Backend API: **[https://api-rt.dbsnetwork.my.id/api](https://api-rt.dbsnetwork.my.id/api)**
+
 ## Teknologi Utama
 - **Framework**: React 19
 - **Build Tool**: Vite
@@ -33,9 +39,9 @@ npm install
 ### 4. Konfigurasi Environment
 Buat file `.env` di root directory:
 ```env
-VITE_API_URL=http://127.0.0.1:8000/api
+VITE_API_URL=https://api-rt.dbsnetwork.my.id/api
 ```
-*Pastikan backend Laravel sudah berjalan di URL tersebut.*
+*Catatan: Jika berjalan secara lokal, ubah menjadi `http://127.0.0.1:8000/api`.*
 
 ### 5. Jalankan Aplikasi
 ```bash
