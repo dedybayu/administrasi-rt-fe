@@ -19,6 +19,13 @@ Backend API: **[https://api-rt.dbsnetwork.my.id/api](https://api-rt.dbsnetwork.m
 
 ---
 
+## Akun Default Login
+Gunakan kredensial berikut untuk masuk ke dalam sistem (pastikan Anda sudah menjalankan *seeding* di backend):
+- **Role RT**: `ketuart` / `password123`
+- **Role Warga**: (Username diambil secara otomatis saat seeding, silakan cek tabel `m_users` di database. Password defaultnya adalah `warga123`)
+
+---
+
 ## Panduan Instalasi (Development)
 
 ### 1. Prasyarat
