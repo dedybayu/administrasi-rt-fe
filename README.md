@@ -21,7 +21,7 @@ Antarmuka pengguna untuk sistem administrasi RT yang dibangun menggunakan React,
 
 ### 2. Kloning Repositori
 ```bash
-git clone <url-repositori-ini>
+git clone https://github.com/dedybayu/administrasi-rt-fe.git
 cd administrasi-rt-fe
 ```
 
