@@ -25,19 +25,21 @@ export const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({ userName, isRt, lo
         </div>
 
         {/* Quick Balance Card */}
-        <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-inner flex flex-col gap-1 min-w-[240px]">
-          <div className="flex items-center gap-2 text-white/60 mb-1">
-            <Wallet size={16} />
-            <span className="text-xs font-bold uppercase tracking-wider">Total Kas RT</span>
+        {isRt && (
+          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-inner flex flex-col gap-1 min-w-[240px]">
+            <div className="flex items-center gap-2 text-white/60 mb-1">
+              <Wallet size={16} />
+              <span className="text-xs font-bold uppercase tracking-wider">Total Kas RT</span>
+            </div>
+            <h2 className="text-3xl font-black leading-none">
+              {loading ? (
+                <div className="h-8 w-40 bg-white/20 animate-pulse rounded-lg" />
+              ) : (
+                formatRupiah(totalBalance)
+              )}
+            </h2>
           </div>
-          <h2 className="text-3xl font-black leading-none">
-            {loading ? (
-              <div className="h-8 w-40 bg-white/20 animate-pulse rounded-lg" />
-            ) : (
-              formatRupiah(totalBalance)
-            )}
-          </h2>
-        </div>
+        )}
       </div>
 
       {/* Abstract shapes for design */}
